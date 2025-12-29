@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { Persona, Platform } from './types'
-import { buildSystemPrompt, buildPostPrompt, buildReplyPrompt } from './persona'
+import type { Persona, Platform } from './types.js'
+import { buildSystemPrompt, buildPostPrompt, buildReplyPrompt } from './persona.js'
 
 export interface GenerateOptions {
   persona: Persona
@@ -33,10 +33,10 @@ export class ContentGenerator {
     })
 
     const content = message.content[0]
-    if (content.type !== 'text') {
+    if (!content || content.type !== 'text') {
       throw new Error('Unexpected response type')
     }
 
-    return content.text.trim()
+    return (content as { type: 'text'; text: string }).text.trim()
   }
 }

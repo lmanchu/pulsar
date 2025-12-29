@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from './client'
+import { getSupabaseAdmin } from './client.js'
 
 // User Queries
 export async function getUserById(userId: string) {

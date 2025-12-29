@@ -1,5 +1,5 @@
 // @pulsar/core - Shared business logic
 
-export * from './types'
-export * from './content-generator'
-export * from './persona'
+export * from './types.js'
+export * from './content-generator.js'
+export * from './persona.js'

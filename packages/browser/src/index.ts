@@ -1,5 +1,5 @@
 // @pulsar/browser - Puppeteer automation
 
-export * from './browser-pool'
-export * from './twitter'
-export * from './linkedin'
+export * from './browser-pool.js'
+export * from './twitter.js'
+export * from './linkedin.js'

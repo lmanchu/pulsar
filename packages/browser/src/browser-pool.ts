@@ -103,6 +103,8 @@ export class BrowserPool {
 
     for (let i = 0; i < this.pool.length; i++) {
       const instance = this.pool[i]
+      if (!instance) continue
+
       const age = now - instance.createdAt.getTime()
 
       if (!instance.inUse && age > this.maxAge) {

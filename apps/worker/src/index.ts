@@ -1,8 +1,7 @@
 import { Worker, Queue } from 'bullmq'
-import Redis from 'ioredis'
+import { Redis } from 'ioredis'
 import { ContentGenerator } from '@pulsar/core'
 import {
-  getPendingJobs,
   updateContentJobStatus,
   getPersonaById,
   incrementDailyStat,
@@ -14,14 +13,19 @@ import {
 } from '@pulsar/browser'
 
 // Redis connection
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
+const redis = new Redis(redisUrl)
 
 // Queues
 export const postQueue = new Queue('posts', { connection: redis })
 export const replyQueue = new Queue('replies', { connection: redis })
 
 // Content generator
-const generator = new ContentGenerator(process.env.ANTHROPIC_API_KEY!)
+const apiKey = process.env.ANTHROPIC_API_KEY
+if (!apiKey) {
+  throw new Error('ANTHROPIC_API_KEY is required')
+}
+const generator = new ContentGenerator(apiKey)
 
 // Post worker
 const postWorker = new Worker(
@@ -85,7 +89,7 @@ const postWorker = new Worker(
         await updateContentJobStatus(jobId, 'completed', content)
 
         // Increment daily stats
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date().toISOString().split('T')[0] as string
         await incrementDailyStat(userId, today, platform, 'posts')
 
         console.log(`Successfully posted to ${platform}`)
@@ -175,7 +179,7 @@ const replyWorker = new Worker(
 
         await updateContentJobStatus(jobId, 'completed', content)
 
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date().toISOString().split('T')[0] as string
         await incrementDailyStat(userId, today, platform, 'replies')
 
         console.log(`Successfully replied on ${platform}`)

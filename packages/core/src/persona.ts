@@ -1,4 +1,4 @@
-import type { Persona, Platform } from './types'
+import type { Persona, Platform } from './types.js'
 
 export interface PersonaConfig {
   name: string
