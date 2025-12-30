@@ -1,5 +1,7 @@
 import type { Page } from 'puppeteer'
 
+import type { SessionCookie } from './twitter.js'
+
 export interface LinkedInCredentials {
   email: string
   password: string
@@ -11,6 +13,37 @@ export class LinkedInAutomation {
 
   constructor(page: Page) {
     this.page = page
+  }
+
+  async loginWithCookies(cookies: SessionCookie[]): Promise<void> {
+    if (this.loggedIn) return
+
+    // Set cookies before navigating
+    await this.page.setCookie(
+      ...cookies.map((c) => ({
+        name: c.name,
+        value: c.value,
+        domain: c.domain || '.linkedin.com',
+        path: c.path || '/',
+        expires: c.expires,
+        httpOnly: c.httpOnly,
+        secure: c.secure ?? true,
+        sameSite: c.sameSite as 'Strict' | 'Lax' | 'None' | undefined,
+      }))
+    )
+
+    // Navigate to feed to verify session
+    await this.page.goto('https://www.linkedin.com/feed/', {
+      waitUntil: 'networkidle0',
+    })
+
+    // Check if we're actually logged in
+    const currentUrl = this.page.url()
+    if (currentUrl.includes('/login') || currentUrl.includes('/checkpoint')) {
+      throw new Error('Session cookies expired or invalid')
+    }
+
+    this.loggedIn = true
   }
 
   async login(credentials: LinkedInCredentials): Promise<void> {

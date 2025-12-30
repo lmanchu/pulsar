@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import type { Persona, Platform } from './types.js'
 import { buildSystemPrompt, buildPostPrompt, buildReplyPrompt } from './persona.js'
 
@@ -10,10 +10,10 @@ export interface GenerateOptions {
 }
 
 export class ContentGenerator {
-  private client: Anthropic
+  private client: OpenAI
 
   constructor(apiKey: string) {
-    this.client = new Anthropic({ apiKey })
+    this.client = new OpenAI({ apiKey })
   }
 
   async generate(options: GenerateOptions): Promise<string> {
@@ -25,18 +25,20 @@ export class ContentGenerator {
         ? buildPostPrompt(persona.topics)
         : buildReplyPrompt(targetContent || '')
 
-    const message = await this.client.messages.create({
-      model: 'claude-3-5-haiku-latest',
+    const completion = await this.client.chat.completions.create({
+      model: 'gpt-4o-mini',
       max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
     })
 
-    const content = message.content[0]
-    if (!content || content.type !== 'text') {
-      throw new Error('Unexpected response type')
+    const content = completion.choices[0]?.message?.content
+    if (!content) {
+      throw new Error('No content in response')
     }
 
-    return (content as { type: 'text'; text: string }).text.trim()
+    return content.trim()
   }
 }

@@ -12,10 +12,9 @@
   },
   "dependencies": {
     "@pulsar/core": "workspace:*",
-    "@pulsar/db": "workspace:*",
     "@pulsar/browser": "workspace:*",
-    "bullmq": "^5.0.0",
-    "ioredis": "^5.3.0"
+    "@supabase/supabase-js": "^2.49.1",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

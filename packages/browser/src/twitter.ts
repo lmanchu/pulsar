@@ -6,12 +6,54 @@ export interface TwitterCredentials {
   email?: string
 }
 
+export interface SessionCookie {
+  name: string
+  value: string
+  domain?: string
+  path?: string
+  expires?: number
+  httpOnly?: boolean
+  secure?: boolean
+  sameSite?: 'Strict' | 'Lax' | 'None'
+}
+
 export class TwitterAutomation {
   private page: Page
   private loggedIn = false
 
   constructor(page: Page) {
     this.page = page
+  }
+
+  async loginWithCookies(cookies: SessionCookie[]): Promise<void> {
+    if (this.loggedIn) return
+
+    // Set cookies before navigating
+    await this.page.setCookie(
+      ...cookies.map((c) => ({
+        name: c.name,
+        value: c.value,
+        domain: c.domain || '.twitter.com',
+        path: c.path || '/',
+        expires: c.expires,
+        httpOnly: c.httpOnly,
+        secure: c.secure ?? true,
+        sameSite: c.sameSite as 'Strict' | 'Lax' | 'None' | undefined,
+      }))
+    )
+
+    // Navigate to home to verify session
+    await this.page.goto('https://twitter.com/home', {
+      waitUntil: 'networkidle0',
+    })
+
+    // Check if we're actually logged in
+    const currentUrl = this.page.url()
+    if (currentUrl.includes('/login') || currentUrl.includes('/i/flow/login')) {
+      throw new Error('Session cookies expired or invalid')
+    }
+
+    this.loggedIn = true
   }
 
   async login(credentials: TwitterCredentials): Promise<void> {
