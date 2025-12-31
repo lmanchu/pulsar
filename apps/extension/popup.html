@@ -211,13 +211,9 @@
     </div>
 
     <div class="connect-section">
-      <label>Pulsar Server URL</label>
-      <input type="text" id="server-url" placeholder="https://pulsar.example.com" />
-    </div>
-
-    <div class="connect-section">
       <label>Connection Token (from Pulsar dashboard)</label>
-      <input type="text" id="connection-token" placeholder="Enter your token" />
+      <input type="text" id="connection-token" placeholder="Paste your token here" />
+      <input type="hidden" id="server-url" value="https://pulsar.irisgo.xyz" />
     </div>
 
     <button id="connect-btn" class="btn btn-primary" disabled>

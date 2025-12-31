@@ -57,6 +57,10 @@ export async function POST(request: NextRequest) {
       avoid_phrases,
       example_posts,
       is_active,
+      // New AI generation fields
+      mbti_type,
+      generation_source,
+      writing_style,
     } = body
 
     // Validate required fields
@@ -97,6 +101,10 @@ export async function POST(request: NextRequest) {
         avoid_phrases: avoid_phrases || [],
         example_posts: example_posts || [],
         is_active: is_active !== false,
+        // New AI generation fields
+        mbti_type: mbti_type || null,
+        generation_source: generation_source || {},
+        writing_style: writing_style || {},
       })
       .select(`
         *,

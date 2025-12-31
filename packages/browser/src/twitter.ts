@@ -44,8 +44,11 @@ export class TwitterAutomation {
 
     // Navigate to home to verify session
     await this.page.goto('https://twitter.com/home', {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
+    // Wait for page to stabilize
+    await this.delay(3000)
 
     // Check if we're actually logged in
     const currentUrl = this.page.url()
@@ -96,7 +99,8 @@ export class TwitterAutomation {
 
   async post(content: string): Promise<string> {
     await this.page.goto('https://twitter.com/compose/tweet', {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
 
     // Wait for composer
@@ -119,7 +123,7 @@ export class TwitterAutomation {
   }
 
   async reply(targetUrl: string, content: string): Promise<string> {
-    await this.page.goto(targetUrl, { waitUntil: 'networkidle0' })
+    await this.page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 })
 
     // Click reply button
     await this.page.waitForSelector('[data-testid="reply"]')
@@ -145,7 +149,8 @@ export class TwitterAutomation {
 
   async getLatestTweets(handle: string, count = 5): Promise<string[]> {
     await this.page.goto(`https://twitter.com/${handle}`, {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
 
     await this.delay(2000)

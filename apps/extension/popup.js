@@ -24,9 +24,8 @@ const messageDiv = document.getElementById('message');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-  // Load saved settings
-  const saved = await chrome.storage.local.get(['serverUrl', 'connectionToken']);
-  if (saved.serverUrl) serverUrlInput.value = saved.serverUrl;
+  // Load saved token (server URL is now hardcoded)
+  const saved = await chrome.storage.local.get(['connectionToken']);
   if (saved.connectionToken) tokenInput.value = saved.connectionToken;
 
   // Check login status
@@ -37,11 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Event listeners
-serverUrlInput.addEventListener('input', () => {
-  chrome.storage.local.set({ serverUrl: serverUrlInput.value });
-  updateConnectButton();
-});
-
 tokenInput.addEventListener('input', () => {
   chrome.storage.local.set({ connectionToken: tokenInput.value });
   updateConnectButton();
@@ -115,11 +109,10 @@ async function checkLoginStatus() {
 
 // Update connect button state
 function updateConnectButton() {
-  const hasServer = serverUrlInput.value.trim().length > 0;
   const hasToken = tokenInput.value.trim().length > 0;
   const hasLoggedIn = twitterLoggedIn || linkedinLoggedIn;
 
-  connectBtn.disabled = !(hasServer && hasToken && hasLoggedIn);
+  connectBtn.disabled = !(hasToken && hasLoggedIn);
 
   if (!hasLoggedIn) {
     connectBtn.textContent = 'No Accounts Detected';
@@ -136,8 +129,8 @@ async function connectAccounts() {
   const serverUrl = serverUrlInput.value.trim().replace(/\/$/, '');
   const token = tokenInput.value.trim();
 
-  if (!serverUrl || !token) {
-    showMessage('Please enter server URL and token', 'error');
+  if (!token) {
+    showMessage('Please enter your connection token', 'error');
     return;
   }
 
