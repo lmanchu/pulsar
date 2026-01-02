@@ -124,6 +124,8 @@ async function handlePostCommand(message) {
       result = await postToTwitter(content);
     } else if (platform === 'linkedin') {
       result = await postToLinkedIn(content);
+    } else if (platform === 'threads') {
+      result = await postToThreads(content);
     } else {
       throw new Error(`Unknown platform: ${platform}`);
     }
@@ -156,6 +158,8 @@ async function handleReplyCommand(message) {
       result = await replyToTwitter(targetUrl, content);
     } else if (platform === 'linkedin') {
       result = await replyToLinkedIn(targetUrl, content);
+    } else if (platform === 'threads') {
+      result = await replyToThreads(targetUrl, content);
     } else {
       throw new Error(`Unknown platform: ${platform}`);
     }
@@ -386,6 +390,173 @@ async function replyToLinkedIn(targetUrl, content) {
   }
 }
 
+// ==================== Threads Posting ====================
+
+async function postToThreads(content) {
+  const tab = await chrome.tabs.create({
+    url: 'https://www.threads.net/',
+    active: false,
+  });
+
+  try {
+    await waitForTabLoad(tab.id);
+    await sleep(3000);
+
+    // Click "Start a thread" / new post button
+    await executeScript(tab.id, () => {
+      // Try multiple selectors for the compose button
+      const selectors = [
+        '[aria-label="New thread"]',
+        '[aria-label="Create"]',
+        'svg[aria-label="New thread"]',
+        'div[role="button"]:has(svg[aria-label="New thread"])',
+      ];
+
+      for (const selector of selectors) {
+        const btn = document.querySelector(selector);
+        if (btn) {
+          btn.click();
+          return;
+        }
+      }
+
+      // Try clicking on the nav item for compose
+      const navItems = document.querySelectorAll('a[href], div[role="button"]');
+      for (const item of navItems) {
+        if (item.innerHTML.includes('New thread') || item.innerHTML.includes('Create')) {
+          item.click();
+          return;
+        }
+      }
+
+      throw new Error('New thread button not found');
+    });
+
+    await sleep(2000);
+
+    // Type content in the editor
+    await executeScript(tab.id, (text) => {
+      const selectors = [
+        '[contenteditable="true"]',
+        '[role="textbox"]',
+        'div[data-contents="true"]',
+        '.notranslate[contenteditable="true"]',
+      ];
+
+      for (const selector of selectors) {
+        const editor = document.querySelector(selector);
+        if (editor) {
+          editor.focus();
+          document.execCommand('insertText', false, text);
+          return;
+        }
+      }
+      throw new Error('Thread editor not found');
+    }, [content]);
+
+    await sleep(1000);
+
+    // Click post button
+    await executeScript(tab.id, () => {
+      const selectors = [
+        '[aria-label="Post"]',
+        'div[role="button"]:has-text("Post")',
+        'button:has-text("Post")',
+      ];
+
+      // Look for Post button
+      const buttons = document.querySelectorAll('div[role="button"], button');
+      for (const btn of buttons) {
+        if (btn.textContent === 'Post' || btn.getAttribute('aria-label') === 'Post') {
+          btn.click();
+          return;
+        }
+      }
+      throw new Error('Post button not found');
+    });
+
+    await sleep(4000);
+
+    const finalUrl = await getTabUrl(tab.id);
+    return { url: finalUrl };
+  } finally {
+    await chrome.tabs.remove(tab.id).catch(() => {});
+  }
+}
+
+async function replyToThreads(targetUrl, content) {
+  const tab = await chrome.tabs.create({
+    url: targetUrl,
+    active: false,
+  });
+
+  try {
+    await waitForTabLoad(tab.id);
+    await sleep(3000);
+
+    // Click reply button or find reply input
+    await executeScript(tab.id, () => {
+      const selectors = [
+        '[aria-label="Reply"]',
+        '[aria-label="Comment"]',
+        'div[role="button"]:has(svg[aria-label="Reply"])',
+      ];
+
+      for (const selector of selectors) {
+        const btn = document.querySelector(selector);
+        if (btn) {
+          btn.click();
+          return;
+        }
+      }
+      throw new Error('Reply button not found');
+    });
+
+    await sleep(1500);
+
+    // Type reply
+    await executeScript(tab.id, (text) => {
+      const selectors = [
+        '[contenteditable="true"]',
+        '[role="textbox"]',
+        '.notranslate[contenteditable="true"]',
+      ];
+
+      for (const selector of selectors) {
+        const editor = document.querySelector(selector);
+        if (editor) {
+          editor.focus();
+          document.execCommand('insertText', false, text);
+          return;
+        }
+      }
+      throw new Error('Reply editor not found');
+    }, [content]);
+
+    await sleep(1000);
+
+    // Click post/reply button
+    await executeScript(tab.id, () => {
+      const buttons = document.querySelectorAll('div[role="button"], button');
+      for (const btn of buttons) {
+        const text = btn.textContent?.toLowerCase();
+        if (text === 'post' || text === 'reply') {
+          btn.click();
+          return;
+        }
+      }
+      throw new Error('Reply post button not found');
+    });
+
+    await sleep(3000);
+
+    const finalUrl = await getTabUrl(tab.id);
+    return { url: finalUrl };
+  } finally {
+    await chrome.tabs.remove(tab.id).catch(() => {});
+  }
+}
+
 // ==================== Utilities ====================
 
 function sleep(ms) {
@@ -478,6 +649,8 @@ async function getCookiesForPlatform(platform) {
       return [...twitterCookies, ...xCookies];
     } else if (platform === 'linkedin') {
       return await chrome.cookies.getAll({ domain: '.linkedin.com' });
+    } else if (platform === 'threads') {
+      return await chrome.cookies.getAll({ domain: '.threads.net' });
     }
     return [];
   } catch (err) {
