@@ -436,8 +436,8 @@ async function postToThreads(content) {
 
     await sleep(2000);
 
-    // Now in the modal - find and click the text input, then type
-    await executeScript(tab.id, (text) => {
+    // Now in the modal - find the text input, focus it, and paste content
+    const typed = await executeScript(tab.id, async (text) => {
       // Find the contenteditable div in the modal
       const editors = document.querySelectorAll('[contenteditable="true"], [role="textbox"]');
 
@@ -451,24 +451,70 @@ async function postToThreads(content) {
         editor.focus();
         editor.click();
 
-        // Try multiple methods to insert text
-        // Method 1: execCommand
-        const success = document.execCommand('insertText', false, text);
-        if (success && editor.textContent.includes(text)) {
-          return;
+        // Method 1: Try using clipboard API to paste
+        try {
+          await navigator.clipboard.writeText(text);
+          document.execCommand('paste');
+          if (editor.textContent.includes(text.substring(0, 20))) {
+            return true;
+          }
+        } catch (e) {
+          console.log('Clipboard paste failed:', e);
         }
 
-        // Method 2: Set innerHTML directly for contenteditable
-        if (editor.getAttribute('contenteditable') === 'true') {
-          editor.innerHTML = text;
-          // Trigger input event
-          editor.dispatchEvent(new InputEvent('input', { bubbles: true }));
-          return;
+        // Method 2: Simulate typing with keyboard events
+        for (const char of text) {
+          const keyEvent = new KeyboardEvent('keypress', {
+            key: char,
+            code: `Key${char.toUpperCase()}`,
+            charCode: char.charCodeAt(0),
+            keyCode: char.charCodeAt(0),
+            which: char.charCodeAt(0),
+            bubbles: true,
+            cancelable: true,
+          });
+          editor.dispatchEvent(keyEvent);
+
+          // Also dispatch input event
+          const inputEvent = new InputEvent('input', {
+            data: char,
+            inputType: 'insertText',
+            bubbles: true,
+            cancelable: true,
+          });
+          editor.dispatchEvent(inputEvent);
+
+          // For React, also try beforeinput
+          const beforeInputEvent = new InputEvent('beforeinput', {
+            data: char,
+            inputType: 'insertText',
+            bubbles: true,
+            cancelable: true,
+          });
+          editor.dispatchEvent(beforeInputEvent);
         }
+
+        // Method 3: Direct text content manipulation + React state sync
+        if (!editor.textContent.includes(text.substring(0, 20))) {
+          // Set via textContent
+          editor.textContent = text;
+
+          // Trigger all possible events to sync React
+          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          editor.dispatchEvent(new Event('change', { bubbles: true }));
+          editor.dispatchEvent(new Event('blur', { bubbles: true }));
+          editor.dispatchEvent(new Event('focus', { bubbles: true }));
+        }
+
+        return editor.textContent.includes(text.substring(0, 10));
       }
 
       throw new Error('Thread editor not found');
     }, [content]);
+
+    if (!typed) {
+      console.log('[Pulsar] Warning: Text may not have been typed correctly');
+    }
 
     await sleep(1500);
 
