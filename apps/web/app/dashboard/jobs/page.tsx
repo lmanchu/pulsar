@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 interface ContentJob {
   id: string
   job_type: 'post' | 'reply'
-  platform: 'twitter' | 'linkedin'
+  platform: 'twitter' | 'linkedin' | 'threads'
   status: 'pending' | 'generating' | 'ready' | 'copied' | 'posting' | 'completed' | 'failed'
   target_url?: string
   target_content?: string
@@ -113,7 +113,7 @@ export default function JobsPage() {
   const [newJob, setNewJob] = useState({
     persona_id: '',
     social_account_id: '',
-    platform: 'twitter' as 'twitter' | 'linkedin',
+    platform: 'twitter' as 'twitter' | 'linkedin' | 'threads',
     job_type: 'post' as 'post' | 'reply',
     target_url: '',
     scheduled_at: '',
@@ -546,8 +546,10 @@ export default function JobsPage() {
               <div className="flex items-start gap-4">
                 {job.platform === 'twitter' ? (
                   <TwitterIcon className="mt-1 h-5 w-5 text-gray-400" />
-                ) : (
+                ) : job.platform === 'linkedin' ? (
                   <LinkedInIcon className="mt-1 h-5 w-5 text-gray-400" />
+                ) : (
+                  <ThreadsIcon className="mt-1 h-5 w-5 text-gray-400" />
                 )}
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
@@ -714,8 +716,10 @@ export default function JobsPage() {
               <div className="flex items-center gap-4">
                 {selectedJob.platform === 'twitter' ? (
                   <TwitterIcon className="h-6 w-6 text-gray-400" />
-                ) : (
+                ) : selectedJob.platform === 'linkedin' ? (
                   <LinkedInIcon className="h-6 w-6 text-gray-400" />
+                ) : (
+                  <ThreadsIcon className="h-6 w-6 text-gray-400" />
                 )}
                 <div>
                   <p className="text-sm text-gray-400">Platform</p>
@@ -841,7 +845,7 @@ export default function JobsPage() {
               />
               <div className="mt-2 flex justify-between text-xs text-gray-500">
                 <span>{editContent.length} characters</span>
-                <span>{editingJob.platform === 'twitter' ? '280 max recommended' : '3000 max'}</span>
+                <span>{editingJob.platform === 'twitter' ? '280 max recommended' : editingJob.platform === 'threads' ? '500 max recommended' : '3000 max'}</span>
               </div>
             </div>
 
@@ -900,24 +904,27 @@ export default function JobsPage() {
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Platform</label>
                 <div className="flex flex-wrap gap-2">
-                  {['twitter', 'linkedin'].map((p) => (
+                  {[
+                    { id: 'twitter', name: 'Twitter / X' },
+                    { id: 'linkedin', name: 'LinkedIn' },
+                    { id: 'threads', name: 'Threads' },
+                  ].map((p) => (
                     <button
-                      key={p}
-                      onClick={() => setNewJob({ ...newJob, platform: p as 'twitter' | 'linkedin', social_account_id: '' })}
+                      key={p.id}
+                      onClick={() => setNewJob({ ...newJob, platform: p.id as 'twitter' | 'linkedin' | 'threads', social_account_id: '' })}
                       className={`flex-1 min-w-[120px] rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                        newJob.platform === p
-                          ? 'bg-purple-600 text-white'
+                        newJob.platform === p.id
+                          ? p.id === 'threads' ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white' : 'bg-purple-600 text-white'
                           : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                       }`}
                     >
-                      {p === 'twitter' ? 'Twitter / X' : 'LinkedIn'}
+                      {p.name}
                     </button>
                   ))}
                   {/* Coming Soon Platforms */}
                   {[
                     { id: 'instagram', name: 'Instagram' },
                     { id: 'tiktok', name: 'TikTok' },
-                    { id: 'threads', name: 'Threads' },
                   ].map((p) => (
                     <button
                       key={p.id}
@@ -1039,8 +1046,10 @@ export default function JobsPage() {
               <div className="flex items-center gap-3 text-sm text-gray-400">
                 {schedulingJob.platform === 'twitter' ? (
                   <TwitterIcon className="h-5 w-5" />
-                ) : (
+                ) : schedulingJob.platform === 'linkedin' ? (
                   <LinkedInIcon className="h-5 w-5" />
+                ) : (
+                  <ThreadsIcon className="h-5 w-5" />
                 )}
                 <span>{schedulingJob.persona?.name}</span>
                 <StatusBadge status={schedulingJob.status} />
