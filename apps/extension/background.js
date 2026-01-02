@@ -394,7 +394,7 @@ async function replyToLinkedIn(targetUrl, content) {
 
 async function postToThreads(content) {
   const tab = await chrome.tabs.create({
-    url: 'https://www.threads.net/',
+    url: 'https://www.threads.com/',
     active: false,
   });
 
@@ -650,7 +650,9 @@ async function getCookiesForPlatform(platform) {
     } else if (platform === 'linkedin') {
       return await chrome.cookies.getAll({ domain: '.linkedin.com' });
     } else if (platform === 'threads') {
-      return await chrome.cookies.getAll({ domain: '.threads.net' });
+      const threadsCom = await chrome.cookies.getAll({ domain: '.threads.com' });
+      const threadsNet = await chrome.cookies.getAll({ domain: '.threads.net' });
+      return [...threadsCom, ...threadsNet];
     }
     return [];
   } catch (err) {
