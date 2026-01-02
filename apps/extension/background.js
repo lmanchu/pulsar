@@ -395,83 +395,97 @@ async function replyToLinkedIn(targetUrl, content) {
 async function postToThreads(content) {
   const tab = await chrome.tabs.create({
     url: 'https://www.threads.com/',
-    active: false,
+    active: true, // Need active tab for typing to work
   });
 
   try {
     await waitForTabLoad(tab.id);
     await sleep(3000);
 
-    // Click "Start a thread" / new post button
+    // Click on the compose area at the top of the feed
     await executeScript(tab.id, () => {
-      // Try multiple selectors for the compose button
-      const selectors = [
-        '[aria-label="New thread"]',
-        '[aria-label="Create"]',
-        'svg[aria-label="New thread"]',
-        'div[role="button"]:has(svg[aria-label="New thread"])',
+      // Look for the compose placeholder text area
+      const composeSelectors = [
+        'div[role="button"][tabindex="0"]', // The clickable compose area
+        '[data-pressable-container="true"]', // Threads uses this
       ];
 
-      for (const selector of selectors) {
-        const btn = document.querySelector(selector);
-        if (btn) {
+      // Find the compose area by looking for buttons with empty/placeholder text
+      const buttons = document.querySelectorAll('div[role="button"], button');
+      for (const btn of buttons) {
+        const text = btn.textContent || '';
+        // Look for compose area indicators (various languages)
+        if (text.includes('有什麼新鮮事') || text.includes("What's new") ||
+            text.includes('新鮮事') || text.includes('Start a thread') ||
+            btn.getAttribute('aria-label')?.includes('撰寫') ||
+            btn.getAttribute('aria-label')?.includes('compose')) {
           btn.click();
           return;
         }
       }
 
-      // Try clicking on the nav item for compose
-      const navItems = document.querySelectorAll('a[href], div[role="button"]');
-      for (const item of navItems) {
-        if (item.innerHTML.includes('New thread') || item.innerHTML.includes('Create')) {
-          item.click();
-          return;
-        }
+      // Fallback: click the first textbox-like element
+      const textbox = document.querySelector('[role="textbox"]');
+      if (textbox) {
+        textbox.click();
+        return;
       }
 
-      throw new Error('New thread button not found');
+      throw new Error('Compose area not found');
     });
 
     await sleep(2000);
 
-    // Type content in the editor
+    // Now in the modal - find and click the text input, then type
     await executeScript(tab.id, (text) => {
-      const selectors = [
-        '[contenteditable="true"]',
-        '[role="textbox"]',
-        'div[data-contents="true"]',
-        '.notranslate[contenteditable="true"]',
-      ];
+      // Find the contenteditable div in the modal
+      const editors = document.querySelectorAll('[contenteditable="true"], [role="textbox"]');
 
-      for (const selector of selectors) {
-        const editor = document.querySelector(selector);
-        if (editor) {
-          editor.focus();
-          document.execCommand('insertText', false, text);
+      for (const editor of editors) {
+        // Skip if it's just a topic/hashtag input
+        if (editor.getAttribute('placeholder')?.includes('主題') ||
+            editor.getAttribute('placeholder')?.includes('topic')) {
+          continue;
+        }
+
+        editor.focus();
+        editor.click();
+
+        // Try multiple methods to insert text
+        // Method 1: execCommand
+        const success = document.execCommand('insertText', false, text);
+        if (success && editor.textContent.includes(text)) {
+          return;
+        }
+
+        // Method 2: Set innerHTML directly for contenteditable
+        if (editor.getAttribute('contenteditable') === 'true') {
+          editor.innerHTML = text;
+          // Trigger input event
+          editor.dispatchEvent(new InputEvent('input', { bubbles: true }));
           return;
         }
       }
+
       throw new Error('Thread editor not found');
     }, [content]);
 
-    await sleep(1000);
+    await sleep(1500);
 
-    // Click post button
+    // Click the Post/發佈 button
     await executeScript(tab.id, () => {
-      const selectors = [
-        '[aria-label="Post"]',
-        'div[role="button"]:has-text("Post")',
-        'button:has-text("Post")',
-      ];
-
-      // Look for Post button
       const buttons = document.querySelectorAll('div[role="button"], button');
+
       for (const btn of buttons) {
-        if (btn.textContent === 'Post' || btn.getAttribute('aria-label') === 'Post') {
+        const text = (btn.textContent || '').trim();
+        // Match Post button in various languages
+        if (text === 'Post' || text === '發佈' || text === '发布' ||
+            text === 'Publicar' || text === 'Posten') {
           btn.click();
           return;
         }
       }
+
       throw new Error('Post button not found');
     });
 
