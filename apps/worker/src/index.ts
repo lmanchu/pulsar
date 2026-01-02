@@ -11,7 +11,7 @@
 import 'dotenv/config'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { ContentGenerator } from '@pulsar/core'
-import { getBrowserPool, TwitterAutomation, LinkedInAutomation } from '@pulsar/browser'
+import { getBrowserPool, TwitterAutomation, LinkedInAutomation, ThreadsAutomation } from '@pulsar/browser'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 
 // ============================================
@@ -84,7 +84,7 @@ interface ContentJob {
   user_id: string
   persona_id: string
   social_account_id: string | null
-  platform: 'twitter' | 'linkedin'
+  platform: 'twitter' | 'linkedin' | 'threads'
   job_type: 'post' | 'reply'
   target_url: string | null
   target_content: string | null
@@ -334,6 +334,26 @@ async function processJob(
           postUrl = await linkedin.post(content)
         } else if (job.job_type === 'reply' && job.target_url) {
           postUrl = await linkedin.comment(job.target_url, content)
+        }
+      } else if (job.platform === 'threads') {
+        const threads = new ThreadsAutomation(page)
+
+        if (useSession) {
+          // Use session cookies
+          const cookies = (authData as { cookies: Array<{ name: string; value: string; domain?: string; path?: string; expires?: number; httpOnly?: boolean; secure?: boolean; sameSite?: 'Strict' | 'Lax' | 'None' }> }).cookies
+          await threads.loginWithCookies(cookies)
+        } else {
+          // Use credentials (Instagram login)
+          await threads.login({
+            username: authData.username as string,
+            password: authData.password as string,
+          })
+        }
+
+        if (job.job_type === 'post') {
+          postUrl = await threads.post(content)
+        } else if (job.job_type === 'reply' && job.target_url) {
+          postUrl = await threads.reply(job.target_url, content)
         }
       }
 

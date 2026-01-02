@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '../../../../../lib/supabase/server'
-import { getBrowserPool, TwitterAutomation, LinkedInAutomation } from '@pulsar/browser'
-import type { SessionCookie } from '@pulsar/browser'
-import { decrypt, EncryptedData } from '../../../../../lib/crypto'
 
-interface StoredCookie {
-  name: string
-  value: string
-  domain: string
-  path: string
-  expires?: number
-  httpOnly?: boolean
-  secure?: boolean
-  sameSite?: string
+// Declare global functions from server.mjs
+declare global {
+  var sendPostToExtension: (
+    userId: string,
+    jobData: {
+      jobId: string
+      platform: string
+      content: string
+      targetUrl?: string
+      jobType: string
+    }
+  ) => Promise<{ success: boolean; postUrl?: string }>
+  var isExtensionConnected: (userId: string) => boolean
 }
 
 export async function POST(
@@ -30,6 +31,14 @@ export async function POST(
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check if extension is connected
+    if (!global.isExtensionConnected || !global.isExtensionConnected(user.id)) {
+      return NextResponse.json(
+        { error: 'Extension not connected. Please open the Pulsar extension in your browser and ensure it shows "Connected".' },
+        { status: 400 }
+      )
     }
 
     // Get the job
@@ -66,10 +75,10 @@ export async function POST(
       return NextResponse.json({ error: 'No social account linked to this job' }, { status: 400 })
     }
 
-    // Get the social account with encrypted cookies
+    // Get the social account
     const { data: socialAccount, error: accountError } = await supabase
       .from('social_accounts')
-      .select('id, platform, encrypted_cookies, username')
+      .select('id, platform, username')
       .eq('id', job.social_account_id)
       .eq('user_id', user.id)
       .single()
@@ -78,70 +87,21 @@ export async function POST(
       return NextResponse.json({ error: 'Social account not found' }, { status: 404 })
     }
 
-    if (!socialAccount.encrypted_cookies) {
-      return NextResponse.json({ error: 'No cookies found for social account. Please reconnect via extension.' }, { status: 400 })
-    }
-
-    // Decrypt cookies
-    let storedCookies: StoredCookie[]
-    try {
-      const decrypted = decrypt(socialAccount.encrypted_cookies as EncryptedData)
-      storedCookies = decrypted.cookies as StoredCookie[]
-    } catch (decryptError) {
-      console.error('Failed to decrypt cookies:', decryptError)
-      return NextResponse.json({ error: 'Failed to decrypt cookies. Please reconnect via extension.' }, { status: 500 })
-    }
-
-    if (!storedCookies || storedCookies.length === 0) {
-      return NextResponse.json({ error: 'No cookies found for social account. Please reconnect via extension.' }, { status: 400 })
-    }
-
     // Update status to posting
     await supabase
       .from('content_jobs')
       .update({ status: 'posting' })
       .eq('id', id)
 
-    // Acquire browser from pool
-    const pool = getBrowserPool()
-    const { page, release } = await pool.acquire()
-
     try {
-      let postUrl: string | null = null
-
-      // Convert stored cookies to SessionCookie format
-      const cookies: SessionCookie[] = storedCookies.map(c => ({
-        name: c.name,
-        value: c.value,
-        domain: c.domain,
-        path: c.path,
-        expires: c.expires,
-        httpOnly: c.httpOnly,
-        secure: c.secure,
-        sameSite: c.sameSite as 'Strict' | 'Lax' | 'None' | undefined,
-      }))
-
-      if (job.platform === 'twitter') {
-        const twitter = new TwitterAutomation(page)
-        await twitter.loginWithCookies(cookies)
-
-        if (job.job_type === 'reply' && job.target_url) {
-          postUrl = await twitter.reply(job.target_url, content)
-        } else {
-          postUrl = await twitter.post(content)
-        }
-      } else if (job.platform === 'linkedin') {
-        const linkedin = new LinkedInAutomation(page)
-        await linkedin.loginWithCookies(cookies)
-
-        if (job.job_type === 'reply' && job.target_url) {
-          postUrl = await linkedin.comment(job.target_url, content)
-        } else {
-          postUrl = await linkedin.post(content)
-        }
-      } else {
-        throw new Error(`Unsupported platform: ${job.platform}`)
-      }
+      // Send post command to extension via WebSocket
+      const result = await global.sendPostToExtension(user.id, {
+        jobId: id,
+        platform: job.platform,
+        content,
+        targetUrl: job.target_url || undefined,
+        jobType: job.job_type,
+      })
 
       // Update job as completed
       await supabase
@@ -149,18 +109,18 @@ export async function POST(
         .update({
           status: 'completed',
           posted_at: new Date().toISOString(),
-          post_url: postUrl,
+          post_url: result.postUrl || null,
         })
         .eq('id', id)
 
       return NextResponse.json({
         success: true,
-        post_url: postUrl,
-        message: 'Content posted successfully'
+        post_url: result.postUrl,
+        message: 'Content posted successfully via extension'
       })
 
     } catch (postError) {
-      console.error('Puppeteer posting error:', postError)
+      console.error('Extension posting error:', postError)
 
       // Update job as failed
       await supabase
@@ -174,9 +134,6 @@ export async function POST(
       return NextResponse.json({
         error: postError instanceof Error ? postError.message : 'Failed to post content'
       }, { status: 500 })
-    } finally {
-      // Always release the browser back to the pool
-      release()
     }
 
   } catch (error) {

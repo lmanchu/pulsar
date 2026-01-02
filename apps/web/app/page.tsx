@@ -31,7 +31,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            AI-powered automation for Twitter and LinkedIn. Generate engaging content,
+            AI-powered automation for Twitter, LinkedIn, and Threads. Generate engaging content,
             reply to your network, and grow your personal brand while you sleep.
           </p>
           <div className="flex justify-center gap-4">

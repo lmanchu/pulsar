@@ -22,6 +22,13 @@ export function buildSystemPrompt(persona: Persona, platform: Platform): string 
 - No hashtags
 - Structure: Hook → Body → CTA (question or call to action)
     `.trim(),
+    threads: `
+- Posts can be up to 500 characters
+- Casual, conversational tone similar to Twitter
+- Can include simple questions or observations
+- Engage authentically with the community
+- Similar to Twitter but slightly more relaxed
+    `.trim(),
   }
 
   return `You are ${persona.name}. ${persona.bio}

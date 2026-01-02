@@ -19,42 +19,29 @@ export async function GET(
     }
 
     const { data, error } = await supabase
-      .from('content_jobs')
+      .from('news_articles')
       .select(`
-        id,
-        platform,
-        job_type,
-        target_url,
-        target_content,
-        generated_content,
-        final_content,
-        status,
-        error_message,
-        scheduled_at,
-        posted_at,
-        post_url,
-        created_at,
-        updated_at,
-        persona:personas(id, name),
-        social_account:social_accounts(id, username, platform)
+        *,
+        feed:news_feeds(id, name, category),
+        content_job:content_jobs(id, status, post_url, final_content)
       `)
       .eq('id', id)
       .eq('user_id', user.id)
       .single()
 
     if (error) {
-      console.error('Error fetching content job:', error)
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+      console.error('Error fetching article:', error)
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ job: data })
+    return NextResponse.json({ article: data })
   } catch (error) {
-    console.error('Error in GET /api/content-jobs/[id]:', error)
+    console.error('Error in GET /api/news-articles/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function PATCH(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -72,51 +59,33 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { final_content, status, scheduled_at, posted_at } = body
+    const { status, draft_content } = body
 
-    // Build update object with only provided fields
-    const updates: Record<string, unknown> = {}
-    if (final_content !== undefined) updates.final_content = final_content
-    if (status !== undefined) updates.status = status
-    if (scheduled_at !== undefined) updates.scheduled_at = scheduled_at
-    if (posted_at !== undefined) updates.posted_at = posted_at
-
-    if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    // Validate status
+    if (status && !['pending', 'approved', 'rejected', 'published'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 
-    // Verify ownership and update
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (status) updates.status = status
+    if (draft_content !== undefined) updates.draft_content = draft_content
+
     const { data, error } = await supabase
-      .from('content_jobs')
+      .from('news_articles')
       .update(updates)
       .eq('id', id)
       .eq('user_id', user.id)
-      .select(`
-        id,
-        platform,
-        job_type,
-        target_url,
-        generated_content,
-        final_content,
-        status,
-        scheduled_at,
-        updated_at,
-        persona:personas(id, name)
-      `)
+      .select()
       .single()
 
     if (error) {
-      console.error('Error updating content job:', error)
-      return NextResponse.json({ error: 'Failed to update job' }, { status: 500 })
+      console.error('Error updating article:', error)
+      return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
     }
 
-    if (!data) {
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
-    }
-
-    return NextResponse.json({ job: data })
+    return NextResponse.json({ article: data })
   } catch (error) {
-    console.error('Error in PATCH /api/content-jobs/[id]:', error)
+    console.error('Error in PUT /api/news-articles/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -139,19 +108,19 @@ export async function DELETE(
     }
 
     const { error } = await supabase
-      .from('content_jobs')
+      .from('news_articles')
       .delete()
       .eq('id', id)
       .eq('user_id', user.id)
 
     if (error) {
-      console.error('Error deleting content job:', error)
-      return NextResponse.json({ error: 'Failed to delete job' }, { status: 500 })
+      console.error('Error deleting article:', error)
+      return NextResponse.json({ error: 'Failed to delete article' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Error in DELETE /api/content-jobs/[id]:', error)
+    console.error('Error in DELETE /api/news-articles/[id]:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

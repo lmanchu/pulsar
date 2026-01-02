@@ -113,13 +113,47 @@ export class TwitterAutomation {
     })
     await this.delay(500)
 
-    // Click post
+    // Click post and wait for tweet to be submitted
     await this.page.click('[data-testid="tweetButton"]')
+
+    // Wait for the compose modal to close (tweet submitted)
+    // The modal will close after successful submission
+    try {
+      await this.page.waitForFunction(
+        () => !document.querySelector('[data-testid="tweetTextarea_0"]'),
+        { timeout: 15000 }
+      )
+    } catch {
+      // Check for error message
+      const errorElement = await this.page.$('[data-testid="toast"]')
+      if (errorElement) {
+        const errorText = await errorElement.evaluate((el) => el.textContent)
+        throw new Error(`Tweet failed: ${errorText}`)
+      }
+      throw new Error('Tweet submission timed out')
+    }
+
+    await this.delay(1000)
+
+    // Navigate to home to find the posted tweet
+    await this.page.goto('https://twitter.com/home', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    })
     await this.delay(2000)
 
-    // Get the URL of the posted tweet
-    const url = this.page.url()
-    return url
+    // Get the first tweet link (should be the just-posted tweet)
+    const tweetLink = await this.page.$eval(
+      'article[data-testid="tweet"] a[href*="/status/"]',
+      (el) => el.getAttribute('href')
+    ).catch(() => null)
+
+    if (tweetLink) {
+      return `https://twitter.com${tweetLink}`
+    }
+
+    // Fallback: return home URL to indicate success
+    return 'https://twitter.com/home'
   }
 
   async reply(targetUrl: string, content: string): Promise<string> {

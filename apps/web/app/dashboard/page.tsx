@@ -3,6 +3,8 @@ const stats = [
   { name: 'Replies Today', value: '0', limit: '5', platform: 'twitter' },
   { name: 'Posts Today', value: '0', limit: '3', platform: 'linkedin' },
   { name: 'Replies Today', value: '0', limit: '5', platform: 'linkedin' },
+  { name: 'Posts Today', value: '0', limit: '3', platform: 'threads' },
+  { name: 'Replies Today', value: '0', limit: '5', platform: 'threads' },
 ]
 
 const recentJobs = [
@@ -23,6 +25,14 @@ function LinkedInIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  )
+}
+
+function ThreadsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.182.408-2.256 1.33-3.022.88-.73 2.082-1.168 3.59-1.314.89-.09 1.714-.067 2.48.015.167-.47.294-.986.368-1.536l.02-.177-1.417-.127c-1.318-.118-2.275-.328-2.92-.637-.613-.296-.81-.63-.81-1.056 0-.39.196-.779.523-1.041.387-.31.947-.467 1.666-.467.82 0 1.501.235 1.97.68.37.352.59.828.65 1.39l1.936-.26c-.1-.951-.497-1.775-1.18-2.452-.845-.839-2.015-1.284-3.384-1.284-1.265 0-2.34.393-3.107 1.14-.813.79-1.213 1.855-1.127 2.998.073 1.004.494 1.836 1.25 2.473.711.598 1.662 1.01 2.83 1.222l1.054.165-.028.257c-.093.855-.3 1.618-.614 2.27-1.053-.156-2.01-.17-2.87-.043-1.167.172-2.135.58-2.8 1.183-.592.537-.928 1.233-.976 2.016-.051.833.266 1.591.91 2.185.723.668 1.778 1.025 3.059 1.032 1.186-.027 2.176-.417 2.942-1.16.65-.629 1.105-1.475 1.357-2.52.498.247.92.56 1.264.94.72.797 1.068 1.857 1.033 3.148-.045 1.69-.724 3.13-2.022 4.287C17.612 23.318 15.258 23.98 12.186 24z" />
     </svg>
   )
 }
@@ -53,7 +63,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -63,8 +73,10 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-400">{stat.name}</span>
               {stat.platform === 'twitter' ? (
                 <TwitterIcon className="h-5 w-5 text-gray-500" />
-              ) : (
+              ) : stat.platform === 'linkedin' ? (
                 <LinkedInIcon className="h-5 w-5 text-gray-500" />
+              ) : (
+                <ThreadsIcon className="h-5 w-5 text-gray-500" />
               )}
             </div>
             <div className="mt-2 flex items-baseline">
@@ -82,7 +94,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <button className="flex items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 font-medium text-white transition-colors hover:bg-purple-500">
           <TwitterIcon className="h-5 w-5" />
           Create Twitter Post
@@ -90,6 +102,10 @@ export default function DashboardPage() {
         <button className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-medium text-white transition-colors hover:bg-blue-500">
           <LinkedInIcon className="h-5 w-5" />
           Create LinkedIn Post
+        </button>
+        <button className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 px-4 py-3 font-medium text-white transition-colors hover:from-purple-500 hover:to-pink-400">
+          <ThreadsIcon className="h-5 w-5" />
+          Create Threads Post
         </button>
         <button className="flex items-center justify-center gap-2 rounded-xl bg-gray-800 px-4 py-3 font-medium text-white transition-colors hover:bg-gray-700">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -110,8 +126,10 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4">
                 {job.platform === 'twitter' ? (
                   <TwitterIcon className="h-5 w-5 text-gray-400" />
-                ) : (
+                ) : job.platform === 'linkedin' ? (
                   <LinkedInIcon className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <ThreadsIcon className="h-5 w-5 text-gray-400" />
                 )}
                 <div>
                   <p className="text-sm font-medium text-white">

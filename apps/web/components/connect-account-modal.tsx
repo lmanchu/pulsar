@@ -5,11 +5,11 @@ import { useState } from 'react'
 type AuthMethod = 'session' | 'credentials'
 
 interface ConnectAccountModalProps {
-  platform: 'twitter' | 'linkedin'
+  platform: 'twitter' | 'linkedin' | 'threads'
   isOpen: boolean
   onClose: () => void
   onConnect: (data: { username: string; credentials: Record<string, string> }) => Promise<void>
-  onStartSession?: (platform: 'twitter' | 'linkedin') => Promise<void>
+  onStartSession?: (platform: 'twitter' | 'linkedin' | 'threads') => Promise<void>
 }
 
 export function ConnectAccountModal({
@@ -45,13 +45,18 @@ export function ConnectAccountModal({
               password: formData.password,
               email: formData.email,
             }
+          : platform === 'threads'
+          ? {
+              username: formData.username,
+              password: formData.password,
+            }
           : {
               email: formData.username,
               password: formData.password,
             }
 
       await onConnect({
-        username: platform === 'twitter' ? formData.username : formData.username,
+        username: formData.username,
         credentials,
       })
 
@@ -85,7 +90,7 @@ export function ConnectAccountModal({
     }
   }
 
-  const platformName = platform === 'twitter' ? 'Twitter / X' : 'LinkedIn'
+  const platformName = platform === 'twitter' ? 'Twitter / X' : platform === 'threads' ? 'Threads' : 'LinkedIn'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -205,7 +210,7 @@ export function ConnectAccountModal({
           <form onSubmit={handleCredentialsSubmit} className="mt-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300">
-                {platform === 'twitter' ? 'Username or Email' : 'Email'}
+                {platform === 'twitter' ? 'Username or Email' : platform === 'threads' ? 'Instagram Username' : 'Email'}
               </label>
               <input
                 type="text"
@@ -215,10 +220,15 @@ export function ConnectAccountModal({
                 }
                 className="mt-1 block w-full rounded-lg bg-gray-800 px-4 py-2.5 text-white ring-1 ring-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder={
-                  platform === 'twitter' ? '@username or email' : 'your@email.com'
+                  platform === 'twitter' ? '@username or email' : platform === 'threads' ? '@instagram_username' : 'your@email.com'
                 }
                 required
               />
+              {platform === 'threads' && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Threads uses your Instagram login
+                </p>
+              )}
             </div>
 
             {platform === 'twitter' && (

@@ -6,7 +6,7 @@ interface ContentJob {
   id: string
   job_type: 'post' | 'reply'
   platform: 'twitter' | 'linkedin'
-  status: 'pending' | 'generating' | 'ready' | 'posting' | 'completed' | 'failed'
+  status: 'pending' | 'generating' | 'ready' | 'copied' | 'posting' | 'completed' | 'failed'
   target_url?: string
   target_content?: string
   generated_content?: string
@@ -48,11 +48,36 @@ function LinkedInIcon({ className }: { className?: string }) {
   )
 }
 
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  )
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  )
+}
+
+function ThreadsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.182.408-2.256 1.332-3.022.88-.73 2.106-1.166 3.55-1.264 1.076-.073 2.076.008 2.983.193-.043-1.19-.464-2.058-1.24-2.575-.872-.581-2.083-.725-3.156-.514l-.478-1.96c1.52-.297 3.276-.135 4.664.705 1.193.723 1.998 1.865 2.329 3.303.333-.08.673-.14 1.016-.177.799-.086 1.573-.017 2.3.144.32-2.418-.387-4.343-1.983-5.715C16.78 2.622 14.727 1.92 12.195 1.9c-3.236.024-5.7 1.058-7.326 3.074-1.535 1.903-2.32 4.574-2.348 7.945v.162c.028 3.372.814 6.043 2.35 7.945 1.626 2.016 4.09 3.05 7.325 3.074 2.98-.022 5.218-.85 6.838-2.532 1.728-1.796 2.088-4.282 1.096-6.41-.512-1.097-1.353-1.987-2.508-2.65-.143.623-.35 1.214-.616 1.763.675.37 1.204.85 1.564 1.42.588.937.705 2.066.33 3.187-.458 1.373-1.686 2.408-3.467 2.922-1.16.335-2.409.384-3.618.144z" />
+    </svg>
+  )
+}
+
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending: 'bg-gray-500/10 text-gray-400 ring-gray-500/20',
     generating: 'bg-blue-500/10 text-blue-400 ring-blue-500/20',
     ready: 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/20',
+    copied: 'bg-cyan-500/10 text-cyan-400 ring-cyan-500/20',
     posting: 'bg-purple-500/10 text-purple-400 ring-purple-500/20',
     completed: 'bg-green-500/10 text-green-400 ring-green-500/20',
     failed: 'bg-red-500/10 text-red-400 ring-red-500/20',
@@ -79,6 +104,10 @@ export default function JobsPage() {
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [posting, setPosting] = useState<string | null>(null)
+  const [copiedJobId, setCopiedJobId] = useState<string | null>(null)
+
+  const [schedulingJob, setSchedulingJob] = useState<ContentJob | null>(null)
+  const [scheduleTime, setScheduleTime] = useState('')
 
   // Create job form state
   const [newJob, setNewJob] = useState({
@@ -87,12 +116,20 @@ export default function JobsPage() {
     platform: 'twitter' as 'twitter' | 'linkedin',
     job_type: 'post' as 'post' | 'reply',
     target_url: '',
+    scheduled_at: '',
   })
 
   useEffect(() => {
     fetchJobs()
     fetchPersonas()
     fetchSocialAccounts()
+
+    // Auto-refresh every minute to update due indicators
+    const interval = setInterval(() => {
+      fetchJobs()
+    }, 60000)
+
+    return () => clearInterval(interval)
   }, [])
 
   async function fetchJobs() {
@@ -159,7 +196,7 @@ export default function JobsPage() {
       const data = await res.json()
       if (res.ok) {
         setShowCreateModal(false)
-        setNewJob({ persona_id: '', social_account_id: '', platform: 'twitter', job_type: 'post', target_url: '' })
+        setNewJob({ persona_id: '', social_account_id: '', platform: 'twitter', job_type: 'post', target_url: '', scheduled_at: '' })
         fetchJobs() // Refresh list
       } else {
         alert(data.error || 'Failed to create job')
@@ -250,9 +287,119 @@ export default function JobsPage() {
     }
   }
 
+  async function copyContent(job: ContentJob) {
+    const content = job.final_content || job.generated_content
+    if (!content) return
+
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopiedJobId(job.id)
+      setTimeout(() => setCopiedJobId(null), 2000)
+
+      // Update status to 'copied' if currently 'ready'
+      if (job.status === 'ready') {
+        await fetch(`/api/content-jobs/${job.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'copied' }),
+        })
+        fetchJobs()
+      }
+    } catch (err) {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = content
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopiedJobId(job.id)
+      setTimeout(() => setCopiedJobId(null), 2000)
+
+      // Update status to 'copied' if currently 'ready'
+      if (job.status === 'ready') {
+        await fetch(`/api/content-jobs/${job.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'copied' }),
+        })
+        fetchJobs()
+      }
+    }
+  }
+
+  async function markAsPosted(job: ContentJob) {
+    try {
+      const res = await fetch(`/api/content-jobs/${job.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'completed',
+          posted_at: new Date().toISOString(),
+        }),
+      })
+      if (res.ok) {
+        setSelectedJob(null)
+        fetchJobs()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to update status')
+      }
+    } catch (err) {
+      alert('Failed to update status')
+    }
+  }
+
+  async function updateSchedule(job: ContentJob, scheduledAt: string | null) {
+    try {
+      const res = await fetch(`/api/content-jobs/${job.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduled_at: scheduledAt }),
+      })
+      if (res.ok) {
+        setSchedulingJob(null)
+        setScheduleTime('')
+        fetchJobs()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to update schedule')
+      }
+    } catch (err) {
+      alert('Failed to update schedule')
+    }
+  }
+
+  function isJobDue(job: ContentJob): boolean {
+    if (!job.scheduled_at) return false
+    if (!['ready', 'copied'].includes(job.status)) return false
+    return new Date(job.scheduled_at) <= new Date()
+  }
+
+  function getTimeUntilDue(job: ContentJob): string | null {
+    if (!job.scheduled_at) return null
+    const scheduled = new Date(job.scheduled_at)
+    const now = new Date()
+    const diffMs = scheduled.getTime() - now.getTime()
+
+    if (diffMs <= 0) return 'Now'
+
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffDays > 0) return `in ${diffDays}d`
+    if (diffHours > 0) return `in ${diffHours}h`
+    return `in ${diffMins}m`
+  }
+
+  const dueJobs = jobs.filter(isJobDue)
+
   const filteredJobs = jobs.filter((job) => {
     if (filter === 'all') return true
-    if (filter === 'pending') return ['pending', 'generating', 'ready', 'posting'].includes(job.status)
+    if (filter === 'pending') return ['pending', 'generating', 'ready', 'copied', 'posting'].includes(job.status)
     return job.status === filter
   })
 
@@ -312,6 +459,33 @@ export default function JobsPage() {
           Create Job
         </button>
       </div>
+
+      {/* Due Now Alert */}
+      {dueJobs.length > 0 && (
+        <div className="rounded-xl bg-orange-500/10 p-4 ring-1 ring-orange-500/30">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-orange-500/20 p-2">
+              <svg className="h-5 w-5 text-orange-400 animate-pulse" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-orange-400">
+                {dueJobs.length} {dueJobs.length === 1 ? 'post is' : 'posts are'} ready to publish!
+              </p>
+              <p className="text-sm text-orange-300/70">
+                {dueJobs.map(j => j.persona?.name || 'Unknown').join(', ')}
+              </p>
+            </div>
+            <button
+              onClick={() => dueJobs[0] && setSelectedJob(dueJobs[0])}
+              className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-400"
+            >
+              Review & Post
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Empty state */}
       {jobs.length === 0 && (
@@ -403,12 +577,23 @@ export default function JobsPage() {
                   <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
                     <span>Created {formatDate(job.created_at)}</span>
                     {job.scheduled_at && (
-                      <span className="flex items-center gap-1">
+                      <span className={`flex items-center gap-1 ${isJobDue(job) ? 'text-orange-400 font-medium' : ''}`}>
+                        <svg className={`h-4 w-4 ${isJobDue(job) ? 'animate-pulse' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {isJobDue(job) ? 'Due now!' : `Due ${getTimeUntilDue(job)}`}
+                      </span>
+                    )}
+                    {!job.scheduled_at && ['ready', 'copied'].includes(job.status) && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSchedulingJob(job); setScheduleTime(''); }}
+                        className="flex items-center gap-1 text-purple-400 hover:text-purple-300 transition-colors"
+                      >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Scheduled: {new Date(job.scheduled_at).toLocaleString()}
-                      </span>
+                        Set reminder
+                      </button>
                     )}
                   </div>
                 </div>
@@ -424,6 +609,14 @@ export default function JobsPage() {
                     {posting === job.id ? 'Posting...' : 'Post Now'}
                   </button>
                 )}
+                {job.status === 'copied' && (
+                  <button
+                    onClick={() => markAsPosted(job)}
+                    className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-green-500"
+                  >
+                    ✓ Mark as Posted
+                  </button>
+                )}
                 {job.status === 'failed' && (
                   <button
                     onClick={() => postNow(job)}
@@ -431,6 +624,33 @@ export default function JobsPage() {
                     className="rounded-lg bg-gray-800 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 disabled:opacity-50"
                   >
                     {posting === job.id ? 'Retrying...' : 'Retry'}
+                  </button>
+                )}
+                {(job.final_content || job.generated_content) && (
+                  <button
+                    onClick={() => copyContent(job)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+                      copiedJobId === job.id
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-800 text-white hover:bg-gray-700'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copiedJobId === job.id ? (
+                      <span className="flex items-center gap-1.5">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        Copied!
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                        </svg>
+                        Copy
+                      </span>
+                    )}
                   </button>
                 )}
                 <button
@@ -531,6 +751,18 @@ export default function JobsPage() {
               )}
 
               <div className="flex gap-4 pt-4">
+                {(selectedJob.final_content || selectedJob.generated_content) && (
+                  <button
+                    onClick={() => copyContent(selectedJob)}
+                    className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                      copiedJobId === selectedJob.id
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-800 text-white hover:bg-gray-700'
+                    }`}
+                  >
+                    {copiedJobId === selectedJob.id ? '✓ Copied!' : 'Copy to Clipboard'}
+                  </button>
+                )}
                 {selectedJob.status === 'ready' && (
                   <button
                     onClick={() => postNow(selectedJob)}
@@ -538,6 +770,14 @@ export default function JobsPage() {
                     className="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500 disabled:bg-purple-600/50"
                   >
                     {posting === selectedJob.id ? 'Posting...' : 'Post Now'}
+                  </button>
+                )}
+                {selectedJob.status === 'copied' && (
+                  <button
+                    onClick={() => markAsPosted(selectedJob)}
+                    className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-500"
+                  >
+                    ✓ Mark as Posted
                   </button>
                 )}
                 {selectedJob.status === 'failed' && (
@@ -659,18 +899,33 @@ export default function JobsPage() {
               {/* Platform */}
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Platform</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {['twitter', 'linkedin'].map((p) => (
                     <button
                       key={p}
                       onClick={() => setNewJob({ ...newJob, platform: p as 'twitter' | 'linkedin', social_account_id: '' })}
-                      className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      className={`flex-1 min-w-[120px] rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                         newJob.platform === p
                           ? 'bg-purple-600 text-white'
                           : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                       }`}
                     >
                       {p === 'twitter' ? 'Twitter / X' : 'LinkedIn'}
+                    </button>
+                  ))}
+                  {/* Coming Soon Platforms */}
+                  {[
+                    { id: 'instagram', name: 'Instagram' },
+                    { id: 'tiktok', name: 'TikTok' },
+                    { id: 'threads', name: 'Threads' },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      disabled
+                      className="flex-1 min-w-[120px] rounded-lg px-4 py-2 text-sm font-medium bg-gray-800/50 text-gray-500 cursor-not-allowed opacity-60 relative"
+                    >
+                      {p.name}
+                      <span className="absolute -top-2 -right-2 text-[10px] bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded-full">Soon</span>
                     </button>
                   ))}
                 </div>
@@ -732,6 +987,18 @@ export default function JobsPage() {
                 </div>
               )}
 
+              {/* Schedule Reminder (optional) */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Post Reminder (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={newJob.scheduled_at}
+                  onChange={(e) => setNewJob({ ...newJob, scheduled_at: e.target.value })}
+                  className="w-full rounded-lg bg-gray-800 px-4 py-2 text-white ring-1 ring-gray-700 focus:ring-purple-500 outline-none"
+                />
+                <p className="mt-1 text-xs text-gray-500">Set a reminder for when you want to post</p>
+              </div>
+
               <div className="flex gap-4 pt-4">
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -745,6 +1012,101 @@ export default function JobsPage() {
                   className="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
                 >
                   {creating ? 'Creating...' : 'Create Job'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule Reminder Modal */}
+      {schedulingJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-gray-900 p-6 ring-1 ring-gray-800">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Set Post Reminder</h2>
+              <button
+                onClick={() => { setSchedulingJob(null); setScheduleTime(''); }}
+                className="text-gray-400 hover:text-white"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <div className="flex items-center gap-3 text-sm text-gray-400">
+                {schedulingJob.platform === 'twitter' ? (
+                  <TwitterIcon className="h-5 w-5" />
+                ) : (
+                  <LinkedInIcon className="h-5 w-5" />
+                )}
+                <span>{schedulingJob.persona?.name}</span>
+                <StatusBadge status={schedulingJob.status} />
+              </div>
+
+              <p className="text-sm text-gray-300 line-clamp-2">
+                {schedulingJob.final_content || schedulingJob.generated_content}
+              </p>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Reminder Time</label>
+                <input
+                  type="datetime-local"
+                  value={scheduleTime}
+                  onChange={(e) => setScheduleTime(e.target.value)}
+                  className="w-full rounded-lg bg-gray-800 px-4 py-2 text-white ring-1 ring-gray-700 focus:ring-purple-500 outline-none"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                {['In 1h', 'In 3h', 'Tomorrow 9AM'].map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => {
+                      const now = new Date()
+                      let target: Date
+                      if (preset === 'In 1h') {
+                        target = new Date(now.getTime() + 60 * 60 * 1000)
+                      } else if (preset === 'In 3h') {
+                        target = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+                      } else {
+                        target = new Date(now)
+                        target.setDate(target.getDate() + 1)
+                        target.setHours(9, 0, 0, 0)
+                      }
+                      const local = new Date(target.getTime() - target.getTimezoneOffset() * 60000)
+                      setScheduleTime(local.toISOString().slice(0, 16))
+                    }}
+                    className="flex-1 rounded-lg bg-gray-800 px-3 py-2 text-xs font-medium text-gray-300 hover:bg-gray-700"
+                  >
+                    {preset}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                {schedulingJob.scheduled_at && (
+                  <button
+                    onClick={() => updateSchedule(schedulingJob, null)}
+                    className="rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-600/30"
+                  >
+                    Remove
+                  </button>
+                )}
+                <button
+                  onClick={() => { setSchedulingJob(null); setScheduleTime(''); }}
+                  className="flex-1 rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => updateSchedule(schedulingJob, scheduleTime ? new Date(scheduleTime).toISOString() : null)}
+                  disabled={!scheduleTime}
+                  className="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                >
+                  Set Reminder
                 </button>
               </div>
             </div>

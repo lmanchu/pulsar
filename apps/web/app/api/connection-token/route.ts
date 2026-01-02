@@ -15,8 +15,8 @@ export async function POST() {
     // Generate a random token
     const token = randomBytes(32).toString('hex')
 
-    // Token expires in 5 minutes
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString()
+    // Token expires in 30 minutes (enough time for user to connect)
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString()
 
     // Delete any existing tokens for this user
     await supabase
@@ -41,7 +41,7 @@ export async function POST() {
     return NextResponse.json({
       token,
       expiresAt,
-      expiresIn: 300, // 5 minutes in seconds
+      expiresIn: 1800, // 30 minutes in seconds
     })
 
   } catch (error) {

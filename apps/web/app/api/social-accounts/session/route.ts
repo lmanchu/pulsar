@@ -9,11 +9,13 @@ const activeSessions = new Map<string, { browser: Browser; page: Page; platform:
 const LOGIN_URLS = {
   twitter: 'https://twitter.com/i/flow/login',
   linkedin: 'https://www.linkedin.com/login',
+  threads: 'https://www.threads.net/login',
 }
 
 const AUTH_CHECK_URLS = {
   twitter: 'https://twitter.com/home',
   linkedin: 'https://www.linkedin.com/feed/',
+  threads: 'https://www.threads.net/',
 }
 
 // POST: Start a new browser session
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { platform } = body
 
-    if (!platform || !['twitter', 'linkedin'].includes(platform)) {
+    if (!platform || !['twitter', 'linkedin', 'threads'].includes(platform)) {
       return NextResponse.json({ error: 'Invalid platform' }, { status: 400 })
     }
 
@@ -119,6 +121,8 @@ export async function GET(request: NextRequest) {
         const cookies = await page.cookies()
         const authCookies = platform === 'twitter'
           ? cookies.filter(c => c.name === 'auth_token' || c.name === 'ct0')
+          : platform === 'threads'
+          ? cookies.filter(c => c.name === 'sessionid' || c.name === 'csrftoken')
           : cookies.filter(c => c.name === 'li_at' || c.name === 'JSESSIONID')
 
         if (authCookies.length < 2) {
@@ -146,6 +150,16 @@ export async function GET(request: NextRequest) {
         } catch {
           username = 'twitter_user'
         }
+      } else if (platform === 'threads') {
+        try {
+          // Try to get username from Threads profile link
+          const profileLink = await page.$eval('a[href^="/@"]', (el) => el.getAttribute('href')).catch(() => '')
+          if (profileLink) {
+            username = profileLink.replace('/@', '')
+          }
+        } catch {
+          username = 'threads_user'
+        }
       } else {
         try {
           // Try to get name from LinkedIn
@@ -162,6 +176,8 @@ export async function GET(request: NextRequest) {
       // Filter relevant cookies
       const relevantCookies = platform === 'twitter'
         ? cookies.filter(c => ['auth_token', 'ct0', 'twid', 'personalization_id'].includes(c.name))
+        : platform === 'threads'
+        ? cookies.filter(c => ['sessionid', 'csrftoken', 'ds_user_id', 'mid', 'ig_did', 'ig_nrcb'].includes(c.name))
         : cookies.filter(c => ['li_at', 'JSESSIONID', 'liap', 'li_mc'].includes(c.name))
 
       // Close browser

@@ -1,4 +1,11 @@
-import puppeteer, { Browser, Page } from 'puppeteer'
+import puppeteerExtra from 'puppeteer-extra'
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import type { Browser, Page } from 'puppeteer'
+
+// Add stealth plugin to avoid bot detection
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const puppeteer = puppeteerExtra as any
+puppeteer.use(StealthPlugin())
 
 export interface BrowserInstance {
   browser: Browser
@@ -74,8 +81,9 @@ export class BrowserPool {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
+        '--disable-blink-features=AutomationControlled',
+        '--disable-infobars',
+        '--window-size=1280,800',
       ],
     })
 
@@ -84,10 +92,15 @@ export class BrowserPool {
     // Set viewport
     await page.setViewport({ width: 1280, height: 800 })
 
-    // Set user agent
+    // Set user agent (Chrome 131 - latest)
     await page.setUserAgent(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
     )
+
+    // Remove webdriver property to avoid detection
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined })
+    })
 
     return {
       browser,

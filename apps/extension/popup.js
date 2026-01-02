@@ -12,8 +12,10 @@ let twitterLoggedIn = false;
 let linkedinLoggedIn = false;
 let twitterCookies = [];
 let linkedinCookies = [];
+let wsConnected = false;
 
 // DOM Elements
+const wsStatus = document.getElementById('ws-status');
 const twitterStatus = document.getElementById('twitter-status');
 const linkedinStatus = document.getElementById('linkedin-status');
 const serverUrlInput = document.getElementById('server-url');
@@ -28,11 +30,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const saved = await chrome.storage.local.get(['connectionToken']);
   if (saved.connectionToken) tokenInput.value = saved.connectionToken;
 
+  // Check WebSocket status
+  await checkWsStatus();
+
   // Check login status
   await checkLoginStatus();
 
   // Update button state
   updateConnectButton();
+});
+
+// Listen for WebSocket status updates from background
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'WS_STATUS') {
+    updateWsStatus(message.connected);
+  }
 });
 
 // Event listeners
@@ -42,7 +54,33 @@ tokenInput.addEventListener('input', () => {
 });
 
 connectBtn.addEventListener('click', connectAccounts);
-checkBtn.addEventListener('click', checkLoginStatus);
+checkBtn.addEventListener('click', async () => {
+  await checkWsStatus();
+  await checkLoginStatus();
+});
+
+// Check WebSocket connection status
+async function checkWsStatus() {
+  try {
+    const response = await chrome.runtime.sendMessage({ type: 'GET_WS_STATUS' });
+    updateWsStatus(response?.connected || false);
+  } catch (err) {
+    console.error('Error checking WS status:', err);
+    updateWsStatus(false);
+  }
+}
+
+// Update WebSocket status display
+function updateWsStatus(connected) {
+  wsConnected = connected;
+  if (connected) {
+    wsStatus.textContent = 'Connected';
+    wsStatus.className = 'status-badge logged-in';
+  } else {
+    wsStatus.textContent = 'Disconnected';
+    wsStatus.className = 'status-badge not-logged-in';
+  }
+}
 
 // Check if user is logged into Twitter and LinkedIn
 async function checkLoginStatus() {
@@ -210,6 +248,14 @@ async function connectAccounts() {
 
     if (response.ok) {
       showMessage(`Successfully connected ${payload.accounts.length} account(s)!`, 'success');
+
+      // Update token in background and reconnect WebSocket
+      await chrome.runtime.sendMessage({ type: 'UPDATE_TOKEN', token });
+
+      // Wait a moment and check WS status
+      setTimeout(async () => {
+        await checkWsStatus();
+      }, 1000);
     } else {
       showMessage(result.error || 'Failed to connect', 'error');
     }

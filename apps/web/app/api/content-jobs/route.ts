@@ -161,6 +161,36 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Clean up AI thinking artifacts from generated content
+function cleanAIArtifacts(content: string): string {
+  let cleaned = content
+
+  // Remove thinking tags and their content (various formats)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/gi, '')
+  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+  cleaned = cleaned.replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+  cleaned = cleaned.replace(/<reflection>[\s\S]*?<\/reflection>/gi, '')
+  cleaned = cleaned.replace(/<analysis>[\s\S]*?<\/analysis>/gi, '')
+
+  // Remove markdown code block wrappers if the whole content is wrapped
+  cleaned = cleaned.replace(/^```[\w]*\n([\s\S]*?)\n```$/g, '$1')
+
+  // Remove common AI reasoning prefixes
+  cleaned = cleaned.replace(/^(Let me think[^.]*\.|I'll think[^.]*\.|Thinking about[^.]*\.|Here's my thought[^.]*\.|My analysis[^.]*\.:?)\s*/i, '')
+  cleaned = cleaned.replace(/^(Sure[,!]?\s*(here'?s?|I'll)[^.]*\.|Certainly[,!]?[^.]*\.|Of course[,!]?[^.]*\.)\s*/i, '')
+  cleaned = cleaned.replace(/^(Here'?s?\s*(a\s+)?[\w\s]+:)\s*/i, '')
+
+  // Remove quotes that wrap the entire content (AI sometimes adds them)
+  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+    cleaned = cleaned.slice(1, -1)
+  }
+
+  // Trim and remove excessive whitespace
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim()
+
+  return cleaned
+}
+
 // AI Content Generation (async, non-blocking)
 async function generateContent(
   supabase: any,
@@ -184,7 +214,9 @@ Topics: ${persona.topics.join(', ')}
 
 ${persona.example_posts?.length ? `Example posts for reference:\n${persona.example_posts.join('\n')}\n` : ''}
 
-Generate content that matches this persona's voice and style.`
+Generate content that matches this persona's voice and style.
+
+IMPORTANT: Output ONLY the final post content. Do not include any thinking, reasoning, analysis, or explanation. Do not wrap the content in quotes or markdown code blocks. Just output the ready-to-post text directly.`
 
     let userPrompt = ''
     if (jobType === 'post') {
@@ -216,11 +248,14 @@ Generate content that matches this persona's voice and style.`
     }
 
     const result = await response.json()
-    const generatedContent = result.choices[0]?.message?.content?.trim()
+    let generatedContent = result.choices[0]?.message?.content?.trim()
 
     if (!generatedContent) {
       throw new Error('No content generated')
     }
+
+    // Clean up AI thinking artifacts from the content
+    generatedContent = cleanAIArtifacts(generatedContent)
 
     // Update job with generated content
     await supabase

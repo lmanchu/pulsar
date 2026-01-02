@@ -34,8 +34,11 @@ export class LinkedInAutomation {
 
     // Navigate to feed to verify session
     await this.page.goto('https://www.linkedin.com/feed/', {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
+    // Wait for page to stabilize
+    await this.delay(3000)
 
     // Check if we're actually logged in
     const currentUrl = this.page.url()
@@ -69,31 +72,132 @@ export class LinkedInAutomation {
 
   async post(content: string): Promise<string> {
     await this.page.goto('https://www.linkedin.com/feed/', {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
+    await this.delay(5000) // Wait longer for feed to fully load
 
-    // Click "Start a post" button
-    await this.page.waitForSelector('[aria-label="Start a post"]')
-    await this.page.click('[aria-label="Start a post"]')
-    await this.delay(1000)
+    // Try multiple selectors for "Start a post" button
+    const postButtonSelectors = [
+      '[aria-label="Start a post"]',
+      '[aria-label="Text"]', // Sometimes shows as "Text" button
+      'button.share-box-feed-entry__trigger',
+      '.share-box-feed-entry__top-bar button',
+      '[data-control-name="share.share_box_input_text"]',
+    ]
 
-    // Wait for modal
-    await this.page.waitForSelector('.ql-editor')
+    let clicked = false
+    for (const selector of postButtonSelectors) {
+      try {
+        await this.page.waitForSelector(selector, { timeout: 5000 })
+        await this.page.click(selector)
+        clicked = true
+        break
+      } catch {
+        continue
+      }
+    }
+
+    if (!clicked) {
+      throw new Error('Could not find post button on LinkedIn')
+    }
+    await this.delay(2000)
+
+    // Wait for modal/editor - try multiple selectors
+    const editorSelectors = [
+      '.ql-editor',
+      '[data-placeholder="What do you want to talk about?"]',
+      '.editor-content[contenteditable="true"]',
+      '[role="textbox"]',
+    ]
+
+    let editorSelector = ''
+    for (const selector of editorSelectors) {
+      try {
+        await this.page.waitForSelector(selector, { timeout: 5000 })
+        editorSelector = selector
+        break
+      } catch {
+        continue
+      }
+    }
+
+    if (!editorSelector) {
+      throw new Error('Could not find editor on LinkedIn')
+    }
     await this.delay(500)
 
     // Type content
-    await this.page.type('.ql-editor', content, { delay: 20 })
-    await this.delay(500)
+    await this.page.type(editorSelector, content, { delay: 20 })
+    await this.delay(1000)
 
-    // Click post button
-    await this.page.click('[aria-label="Post"]')
+    // Click post button - try multiple selectors
+    const submitSelectors = [
+      '[aria-label="Post"]',
+      'button.share-actions__primary-action',
+      '[data-control-name="share.post"]',
+      'button[type="submit"]',
+    ]
+
+    let submitClicked = false
+    for (const selector of submitSelectors) {
+      try {
+        await this.page.waitForSelector(selector, { timeout: 3000 })
+        await this.page.click(selector)
+        submitClicked = true
+        break
+      } catch {
+        continue
+      }
+    }
+
+    if (!submitClicked) {
+      throw new Error('Could not find submit button on LinkedIn')
+    }
+
+    // Wait for the post modal to close (post submitted)
+    try {
+      await this.page.waitForFunction(
+        () => !document.querySelector('.share-box-feed-entry__closed-share-box') &&
+              !document.querySelector('[aria-label="Post"]'),
+        { timeout: 15000 }
+      )
+    } catch {
+      // Check for error message
+      const errorElement = await this.page.$('.artdeco-inline-feedback--error')
+      if (errorElement) {
+        const errorText = await errorElement.evaluate((el) => el.textContent)
+        throw new Error(`LinkedIn post failed: ${errorText}`)
+      }
+      // Modal might have closed, continue
+    }
+
     await this.delay(3000)
 
-    return this.page.url()
+    // Navigate to activity page to get the post URL
+    await this.page.goto('https://www.linkedin.com/in/me/recent-activity/all/', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000,
+    })
+    await this.delay(3000)
+
+    // Get the first post link (should be the just-posted one)
+    const postLink = await this.page.$eval(
+      '.feed-shared-update-v2 a[href*="/feed/update/"]',
+      (el) => el.getAttribute('href')
+    ).catch(() => null)
+
+    if (postLink) {
+      return postLink.startsWith('http') ? postLink : `https://www.linkedin.com${postLink}`
+    }
+
+    // Fallback: return activity page URL
+    return 'https://www.linkedin.com/in/me/recent-activity/all/'
   }
 
   async comment(postUrl: string, content: string): Promise<string> {
-    await this.page.goto(postUrl, { waitUntil: 'networkidle0' })
+    await this.page.goto(postUrl, { waitUntil: 'domcontentloaded', timeout: 60000 })
+    await this.delay(2000)
 
     // Click comment button to expand
     await this.page.waitForSelector('[aria-label*="Comment"]')
@@ -119,7 +223,8 @@ export class LinkedInAutomation {
 
   async getLatestPosts(profileUrl: string, count = 5): Promise<string[]> {
     await this.page.goto(`${profileUrl}/recent-activity/all/`, {
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     })
 
     await this.delay(2000)

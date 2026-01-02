@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const PlatformSchema = z.enum(['twitter', 'linkedin'])
+export const PlatformSchema = z.enum(['twitter', 'linkedin', 'threads'])
 export type Platform = z.infer<typeof PlatformSchema>
 
 export const ContentTypeSchema = z.enum(['post', 'reply'])

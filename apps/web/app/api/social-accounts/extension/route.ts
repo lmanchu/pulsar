@@ -158,8 +158,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Delete the used token (one-time use)
-    await supabase.from('connection_tokens').delete().eq('token', token)
+    // Extend token expiry for WebSocket connection (24 hours)
+    const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    await supabase
+      .from('connection_tokens')
+      .update({ expires_at: newExpiresAt })
+      .eq('token', token)
 
     const successCount = results.filter(r => r.success).length
     return jsonResponse({

@@ -5,7 +5,7 @@ import { ConnectAccountModal } from '../../../components/connect-account-modal'
 
 interface SocialAccount {
   id: string
-  platform: 'twitter' | 'linkedin'
+  platform: 'twitter' | 'linkedin' | 'threads'
   username: string
   display_name: string | null
   avatar_url: string | null
@@ -61,6 +61,31 @@ function LinkedInIcon({ className }: { className?: string }) {
   )
 }
 
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  )
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  )
+}
+
+function ThreadsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.96-.065-1.182.408-2.256 1.332-3.022.88-.73 2.106-1.166 3.55-1.264 1.076-.073 2.076.008 2.983.193-.043-1.19-.464-2.058-1.24-2.575-.872-.581-2.083-.725-3.156-.514l-.478-1.96c1.52-.297 3.276-.135 4.664.705 1.193.723 1.998 1.865 2.329 3.303.333-.08.673-.14 1.016-.177.799-.086 1.573-.017 2.3.144.32-2.418-.387-4.343-1.983-5.715C16.78 2.622 14.727 1.92 12.195 1.9c-3.236.024-5.7 1.058-7.326 3.074-1.535 1.903-2.32 4.574-2.348 7.945v.162c.028 3.372.814 6.043 2.35 7.945 1.626 2.016 4.09 3.05 7.325 3.074 2.98-.022 5.218-.85 6.838-2.532 1.728-1.796 2.088-4.282 1.096-6.41-.512-1.097-1.353-1.987-2.508-2.65-.143.623-.35 1.214-.616 1.763.675.37 1.204.85 1.564 1.42.588.937.705 2.066.33 3.187-.458 1.373-1.686 2.408-3.467 2.922-1.16.335-2.409.384-3.618.144z" />
+      <path d="M12.478 11.033c-.89.06-1.59.281-2.023.637-.37.306-.545.703-.52 1.18.027.495.258.912.668 1.205.475.34 1.142.507 1.93.484 1.09-.032 1.913-.406 2.449-1.112.395-.52.62-1.174.673-1.96-.655-.155-1.377-.24-2.148-.24-.348 0-.7.019-1.03.055v-.25z" />
+    </svg>
+  )
+}
+
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 function formatLastUsed(dateString: string | null): string {
@@ -84,7 +109,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'connections' | 'schedule' | 'subscription'>('connections')
   const [connectModal, setConnectModal] = useState<{
     isOpen: boolean
-    platform: 'twitter' | 'linkedin'
+    platform: 'twitter' | 'linkedin' | 'threads'
   }>({ isOpen: false, platform: 'twitter' })
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [connectionToken, setConnectionToken] = useState<string | null>(null)
@@ -153,7 +178,7 @@ export default function SettingsPage() {
     }
   }
 
-  const handleStartSession = async (platform: 'twitter' | 'linkedin') => {
+  const handleStartSession = async (platform: 'twitter' | 'linkedin' | 'threads') => {
     // Start browser session
     const startRes = await fetch('/api/social-accounts/session', {
       method: 'POST',
@@ -204,7 +229,7 @@ export default function SettingsPage() {
     ))
   }
 
-  const getAccountByPlatform = (platform: 'twitter' | 'linkedin') => {
+  const getAccountByPlatform = (platform: 'twitter' | 'linkedin' | 'threads') => {
     return accounts.find(a => a.platform === platform && a.is_active)
   }
 
@@ -278,7 +303,7 @@ export default function SettingsPage() {
               </div>
             ) : (
               <div className="mt-6 space-y-4">
-                {(['twitter', 'linkedin'] as const).map((platform) => {
+                {(['twitter', 'linkedin', 'threads'] as const).map((platform) => {
                   const account = getAccountByPlatform(platform)
                   const isConnected = !!account
 
@@ -292,9 +317,13 @@ export default function SettingsPage() {
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">
                             <TwitterIcon className="h-6 w-6 text-white" />
                           </div>
-                        ) : (
+                        ) : platform === 'linkedin' ? (
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600">
                             <LinkedInIcon className="h-6 w-6 text-white" />
+                          </div>
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-800">
+                            <ThreadsIcon className="h-6 w-6 text-white" />
                           </div>
                         )}
                         <div>
@@ -337,6 +366,32 @@ export default function SettingsPage() {
                     </div>
                   )
                 })}
+
+                {/* Coming Soon Platforms */}
+                {[
+                  { id: 'instagram', name: 'Instagram', icon: InstagramIcon, bgColor: 'bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400' },
+                  { id: 'tiktok', name: 'TikTok', icon: TikTokIcon, bgColor: 'bg-gray-800' },
+                ].map((platform) => (
+                  <div
+                    key={platform.id}
+                    className="flex items-center justify-between rounded-lg bg-gray-800/30 p-4 opacity-60"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`flex h-12 w-12 items-center justify-center rounded-full ${platform.bgColor}`}>
+                        <platform.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-white">{platform.name}</p>
+                        <p className="text-sm text-gray-500">Coming soon</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center rounded-full bg-gray-700/50 px-3 py-1 text-xs font-medium text-gray-400 ring-1 ring-gray-600">
+                        Coming Soon
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
