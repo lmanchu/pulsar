@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!['twitter', 'linkedin'].includes(platform)) {
+    if (!['twitter', 'linkedin', 'threads'].includes(platform)) {
       return NextResponse.json(
-        { error: 'Invalid platform. Must be twitter or linkedin' },
+        { error: 'Invalid platform. Must be twitter, linkedin, or threads' },
         { status: 400 }
       )
     }
@@ -220,7 +220,7 @@ IMPORTANT: Output ONLY the final post content. Do not include any thinking, reas
 
     let userPrompt = ''
     if (jobType === 'post') {
-      const charLimit = platform === 'twitter' ? 280 : 3000
+      const charLimit = platform === 'twitter' ? 280 : platform === 'threads' ? 500 : 3000
       userPrompt = `Create a ${platform} post (max ${charLimit} characters) about one of your expertise topics. Be authentic and engaging.`
     } else {
       userPrompt = `Write a thoughtful reply to this post:\n"${targetContent}"\n\nKeep it concise, authentic, and add value to the conversation.`

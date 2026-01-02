@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!['twitter', 'linkedin'].includes(platform)) {
+    if (!['twitter', 'linkedin', 'threads'].includes(platform)) {
       return NextResponse.json(
-        { error: 'Invalid platform. Must be twitter or linkedin' },
+        { error: 'Invalid platform. Must be twitter, linkedin, or threads' },
         { status: 400 }
       )
     }
