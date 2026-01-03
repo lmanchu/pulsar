@@ -393,228 +393,157 @@ async function replyToLinkedIn(targetUrl, content) {
 // ==================== Threads Posting ====================
 
 async function postToThreads(content) {
+  // Threads uses React which prevents automated text input
+  // Use manual mode: copy to clipboard and let user paste
+
+  // Copy content to clipboard
+  await chrome.offscreen?.createDocument?.({
+    url: 'offscreen.html',
+    reasons: ['CLIPBOARD'],
+    justification: 'Copy content to clipboard for Threads posting',
+  }).catch(() => {}); // Ignore if already exists or not supported
+
+  // Use a background-compatible clipboard approach
+  const copySuccess = await executeScriptInNewTab(content);
+
+  // Open Threads in a new tab
   const tab = await chrome.tabs.create({
     url: 'https://www.threads.com/',
-    active: true, // Need active tab for typing to work
+    active: true,
   });
 
-  try {
-    await waitForTabLoad(tab.id);
-    await sleep(3000);
+  await waitForTabLoad(tab.id);
+  await sleep(2000);
 
-    // Click on the compose area at the top of the feed
-    await executeScript(tab.id, () => {
-      // Look for the compose placeholder text area
-      const composeSelectors = [
-        'div[role="button"][tabindex="0"]', // The clickable compose area
-        '[data-pressable-container="true"]', // Threads uses this
-      ];
-
-      // Find the compose area by looking for buttons with empty/placeholder text
-      const buttons = document.querySelectorAll('div[role="button"], button');
-      for (const btn of buttons) {
-        const text = btn.textContent || '';
-        // Look for compose area indicators (various languages)
-        if (text.includes('有什麼新鮮事') || text.includes("What's new") ||
-            text.includes('新鮮事') || text.includes('Start a thread') ||
-            btn.getAttribute('aria-label')?.includes('撰寫') ||
-            btn.getAttribute('aria-label')?.includes('compose')) {
-          btn.click();
-          return;
-        }
-      }
-
-      // Fallback: click the first textbox-like element
-      const textbox = document.querySelector('[role="textbox"]');
-      if (textbox) {
-        textbox.click();
+  // Click on the compose area to open the modal
+  await executeScript(tab.id, () => {
+    const buttons = document.querySelectorAll('div[role="button"], button');
+    for (const btn of buttons) {
+      const text = btn.textContent || '';
+      if (text.includes('有什麼新鮮事') || text.includes("What's new") ||
+          text.includes('新鮮事') || text.includes('Start a thread')) {
+        btn.click();
         return;
       }
-
-      throw new Error('Compose area not found');
-    });
-
-    await sleep(2000);
-
-    // Now in the modal - find the text input, focus it, and paste content
-    const typed = await executeScript(tab.id, async (text) => {
-      // Find the contenteditable div in the modal
-      const editors = document.querySelectorAll('[contenteditable="true"], [role="textbox"]');
-
-      for (const editor of editors) {
-        // Skip if it's just a topic/hashtag input
-        if (editor.getAttribute('placeholder')?.includes('主題') ||
-            editor.getAttribute('placeholder')?.includes('topic')) {
-          continue;
-        }
-
-        editor.focus();
-        editor.click();
-
-        // Method 1: Try using clipboard API to paste
-        try {
-          await navigator.clipboard.writeText(text);
-          document.execCommand('paste');
-          if (editor.textContent.includes(text.substring(0, 20))) {
-            return true;
-          }
-        } catch (e) {
-          console.log('Clipboard paste failed:', e);
-        }
-
-        // Method 2: Simulate typing with keyboard events
-        for (const char of text) {
-          const keyEvent = new KeyboardEvent('keypress', {
-            key: char,
-            code: `Key${char.toUpperCase()}`,
-            charCode: char.charCodeAt(0),
-            keyCode: char.charCodeAt(0),
-            which: char.charCodeAt(0),
-            bubbles: true,
-            cancelable: true,
-          });
-          editor.dispatchEvent(keyEvent);
-
-          // Also dispatch input event
-          const inputEvent = new InputEvent('input', {
-            data: char,
-            inputType: 'insertText',
-            bubbles: true,
-            cancelable: true,
-          });
-          editor.dispatchEvent(inputEvent);
-
-          // For React, also try beforeinput
-          const beforeInputEvent = new InputEvent('beforeinput', {
-            data: char,
-            inputType: 'insertText',
-            bubbles: true,
-            cancelable: true,
-          });
-          editor.dispatchEvent(beforeInputEvent);
-        }
-
-        // Method 3: Direct text content manipulation + React state sync
-        if (!editor.textContent.includes(text.substring(0, 20))) {
-          // Set via textContent
-          editor.textContent = text;
-
-          // Trigger all possible events to sync React
-          editor.dispatchEvent(new Event('input', { bubbles: true }));
-          editor.dispatchEvent(new Event('change', { bubbles: true }));
-          editor.dispatchEvent(new Event('blur', { bubbles: true }));
-          editor.dispatchEvent(new Event('focus', { bubbles: true }));
-        }
-
-        return editor.textContent.includes(text.substring(0, 10));
-      }
-
-      throw new Error('Thread editor not found');
-    }, [content]);
-
-    if (!typed) {
-      console.log('[Pulsar] Warning: Text may not have been typed correctly');
     }
+    const textbox = document.querySelector('[role="textbox"]');
+    if (textbox) textbox.click();
+  });
 
-    await sleep(1500);
+  await sleep(1000);
 
-    // Click the Post/發佈 button
-    await executeScript(tab.id, () => {
-      const buttons = document.querySelectorAll('div[role="button"], button');
+  // Show instruction alert to user
+  await executeScript(tab.id, (text) => {
+    // Create a toast notification
+    const toast = document.createElement('div');
+    toast.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        max-width: 400px;
+        text-align: center;
+      ">
+        <div style="font-weight: bold; margin-bottom: 8px;">📋 Pulsar - 內容已複製</div>
+        <div style="margin-bottom: 12px; opacity: 0.9;">請按 Cmd+V 貼上，然後點擊「發佈」</div>
+        <div style="
+          background: rgba(255,255,255,0.2);
+          padding: 10px;
+          border-radius: 8px;
+          font-size: 12px;
+          max-height: 100px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        ">${text.substring(0, 150)}${text.length > 150 ? '...' : ''}</div>
+      </div>
+    `;
+    document.body.appendChild(toast);
 
-      for (const btn of buttons) {
-        const text = (btn.textContent || '').trim();
-        // Match Post button in various languages
-        if (text === 'Post' || text === '發佈' || text === '发布' ||
-            text === 'Publicar' || text === 'Posten') {
-          btn.click();
-          return;
-        }
-      }
+    // Auto-remove after 15 seconds
+    setTimeout(() => toast.remove(), 15000);
+  }, [content]);
 
-      throw new Error('Post button not found');
-    });
+  // Return success - user will complete manually
+  return { url: 'https://www.threads.com/', manual: true };
+}
 
-    await sleep(4000);
-
-    const finalUrl = await getTabUrl(tab.id);
-    return { url: finalUrl };
+// Helper to copy text to clipboard using a temporary tab
+async function executeScriptInNewTab(text) {
+  const tab = await chrome.tabs.create({ url: 'about:blank', active: false });
+  try {
+    await executeScript(tab.id, async (content) => {
+      await navigator.clipboard.writeText(content);
+    }, [text]);
+    return true;
+  } catch (e) {
+    console.error('Failed to copy to clipboard:', e);
+    return false;
   } finally {
     await chrome.tabs.remove(tab.id).catch(() => {});
   }
 }
 
 async function replyToThreads(targetUrl, content) {
+  // Threads uses React - use manual mode for replies too
+
+  // Copy content to clipboard
+  await executeScriptInNewTab(content);
+
+  // Open the target thread
   const tab = await chrome.tabs.create({
     url: targetUrl,
-    active: false,
+    active: true,
   });
 
-  try {
-    await waitForTabLoad(tab.id);
-    await sleep(3000);
+  await waitForTabLoad(tab.id);
+  await sleep(2000);
 
-    // Click reply button or find reply input
-    await executeScript(tab.id, () => {
-      const selectors = [
-        '[aria-label="Reply"]',
-        '[aria-label="Comment"]',
-        'div[role="button"]:has(svg[aria-label="Reply"])',
-      ];
+  // Show instruction toast
+  await executeScript(tab.id, (text) => {
+    const toast = document.createElement('div');
+    toast.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        max-width: 400px;
+        text-align: center;
+      ">
+        <div style="font-weight: bold; margin-bottom: 8px;">📋 Pulsar - 回覆內容已複製</div>
+        <div style="margin-bottom: 12px; opacity: 0.9;">點擊回覆框，按 Cmd+V 貼上，然後發佈</div>
+        <div style="
+          background: rgba(255,255,255,0.2);
+          padding: 10px;
+          border-radius: 8px;
+          font-size: 12px;
+          max-height: 100px;
+          overflow: hidden;
+        ">${text.substring(0, 150)}${text.length > 150 ? '...' : ''}</div>
+      </div>
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 15000);
+  }, [content]);
 
-      for (const selector of selectors) {
-        const btn = document.querySelector(selector);
-        if (btn) {
-          btn.click();
-          return;
-        }
-      }
-      throw new Error('Reply button not found');
-    });
-
-    await sleep(1500);
-
-    // Type reply
-    await executeScript(tab.id, (text) => {
-      const selectors = [
-        '[contenteditable="true"]',
-        '[role="textbox"]',
-        '.notranslate[contenteditable="true"]',
-      ];
-
-      for (const selector of selectors) {
-        const editor = document.querySelector(selector);
-        if (editor) {
-          editor.focus();
-          document.execCommand('insertText', false, text);
-          return;
-        }
-      }
-      throw new Error('Reply editor not found');
-    }, [content]);
-
-    await sleep(1000);
-
-    // Click post/reply button
-    await executeScript(tab.id, () => {
-      const buttons = document.querySelectorAll('div[role="button"], button');
-      for (const btn of buttons) {
-        const text = btn.textContent?.toLowerCase();
-        if (text === 'post' || text === 'reply') {
-          btn.click();
-          return;
-        }
-      }
-      throw new Error('Reply post button not found');
-    });
-
-    await sleep(3000);
-
-    const finalUrl = await getTabUrl(tab.id);
-    return { url: finalUrl };
-  } finally {
-    await chrome.tabs.remove(tab.id).catch(() => {});
-  }
+  return { url: targetUrl, manual: true };
 }
 
 // ==================== Utilities ====================
