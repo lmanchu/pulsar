@@ -72,6 +72,13 @@ function ThreadsIcon({ className }: { className?: string }) {
   )
 }
 
+// Platform automation levels
+const PLATFORM_AUTOMATION: Record<string, { level: 'full' | 'semi', label: string, description: string }> = {
+  twitter: { level: 'full', label: '全自動', description: '一鍵發佈，完全自動化' },
+  linkedin: { level: 'semi', label: '半自動', description: '複製內容後需手動貼上發佈' },
+  threads: { level: 'semi', label: '半自動', description: '複製內容後需手動貼上發佈' },
+}
+
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending: 'bg-gray-500/10 text-gray-400 ring-gray-500/20',
@@ -557,6 +564,11 @@ export default function JobsPage() {
                       {job.job_type}
                     </span>
                     <StatusBadge status={job.status} />
+                    {PLATFORM_AUTOMATION[job.platform]?.level === 'semi' && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400" title={PLATFORM_AUTOMATION[job.platform]?.description}>
+                        半自動
+                      </span>
+                    )}
                     <span className="text-sm text-gray-500">by {job.persona?.name || 'Unknown'}</span>
                   </div>
 
@@ -606,9 +618,18 @@ export default function JobsPage() {
                   <button
                     onClick={() => postNow(job)}
                     disabled={posting === job.id}
-                    className="rounded-lg bg-purple-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-purple-500 disabled:bg-purple-600/50 disabled:cursor-wait"
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-colors disabled:cursor-wait ${
+                      PLATFORM_AUTOMATION[job.platform]?.level === 'semi'
+                        ? 'bg-yellow-600 hover:bg-yellow-500 disabled:bg-yellow-600/50'
+                        : 'bg-purple-600 hover:bg-purple-500 disabled:bg-purple-600/50'
+                    }`}
+                    title={PLATFORM_AUTOMATION[job.platform]?.level === 'semi' ? '複製內容並開啟發文頁面' : '自動發佈'}
                   >
-                    {posting === job.id ? 'Posting...' : 'Post Now'}
+                    {posting === job.id
+                      ? 'Posting...'
+                      : PLATFORM_AUTOMATION[job.platform]?.level === 'semi'
+                        ? '📋 Copy & Post'
+                        : 'Post Now'}
                   </button>
                 )}
                 {job.status === 'copied' && (
@@ -771,9 +792,17 @@ export default function JobsPage() {
                   <button
                     onClick={() => postNow(selectedJob)}
                     disabled={posting === selectedJob.id}
-                    className="flex-1 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500 disabled:bg-purple-600/50"
+                    className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${
+                      PLATFORM_AUTOMATION[selectedJob.platform]?.level === 'semi'
+                        ? 'bg-yellow-600 hover:bg-yellow-500 disabled:bg-yellow-600/50'
+                        : 'bg-purple-600 hover:bg-purple-500 disabled:bg-purple-600/50'
+                    }`}
                   >
-                    {posting === selectedJob.id ? 'Posting...' : 'Post Now'}
+                    {posting === selectedJob.id
+                      ? 'Posting...'
+                      : PLATFORM_AUTOMATION[selectedJob.platform]?.level === 'semi'
+                        ? '📋 Copy & Post'
+                        : 'Post Now'}
                   </button>
                 )}
                 {selectedJob.status === 'copied' && (
@@ -908,19 +937,42 @@ export default function JobsPage() {
                     { id: 'twitter', name: 'Twitter / X' },
                     { id: 'linkedin', name: 'LinkedIn' },
                     { id: 'threads', name: 'Threads' },
-                  ].map((p) => (
+                  ].map((p) => {
+                    const automation = PLATFORM_AUTOMATION[p.id]
+                    return (
                     <button
                       key={p.id}
                       onClick={() => setNewJob({ ...newJob, platform: p.id as 'twitter' | 'linkedin' | 'threads', social_account_id: '' })}
-                      className={`flex-1 min-w-[120px] rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      className={`flex-1 min-w-[120px] rounded-lg px-4 py-2 text-sm font-medium transition-colors relative ${
                         newJob.platform === p.id
                           ? p.id === 'threads' ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white' : 'bg-purple-600 text-white'
                           : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                       }`}
+                      title={automation?.description}
                     >
-                      {p.name}
+                      <span className="flex items-center justify-center gap-1.5">
+                        {p.name}
+                        {automation?.level === 'semi' && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            newJob.platform === p.id
+                              ? 'bg-white/20 text-white'
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {automation.label}
+                          </span>
+                        )}
+                        {automation?.level === 'full' && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            newJob.platform === p.id
+                              ? 'bg-white/20 text-white'
+                              : 'bg-green-500/20 text-green-400'
+                          }`}>
+                            {automation.label}
+                          </span>
+                        )}
+                      </span>
                     </button>
-                  ))}
+                  )})}
                   {/* Coming Soon Platforms */}
                   {[
                     { id: 'instagram', name: 'Instagram' },
@@ -936,6 +988,22 @@ export default function JobsPage() {
                     </button>
                   ))}
                 </div>
+                {/* Semi-automatic mode info banner */}
+                {PLATFORM_AUTOMATION[newJob.platform]?.level === 'semi' && (
+                  <div className="mt-3 rounded-lg bg-yellow-500/10 p-3 ring-1 ring-yellow-500/20">
+                    <div className="flex items-start gap-2">
+                      <svg className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-medium text-yellow-400">半自動模式</p>
+                        <p className="text-xs text-yellow-300/70 mt-0.5">
+                          {newJob.platform === 'linkedin' ? 'LinkedIn' : 'Threads'} 不提供公開 API，點擊「Post Now」後會自動複製內容並開啟發文頁面，請手動貼上 (Cmd+V) 後發佈。
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Social Account */}
