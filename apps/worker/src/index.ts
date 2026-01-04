@@ -262,7 +262,7 @@ async function processJob(
     let content = job.generated_content
     if (!content) {
       if (!generator) {
-        throw new Error('Content generation required but ANTHROPIC_API_KEY not configured')
+        throw new Error('Content generation required but OPENAI_API_KEY not configured')
       }
       console.log('  Generating content...')
       content = await generator.generate({
@@ -396,10 +396,19 @@ async function runWorker(): Promise<void> {
 
   // Initialize content generator (optional - only needed for content generation)
   const openaiKey = process.env.OPENAI_API_KEY
+  const openaiBaseURL = process.env.OPENAI_BASE_URL
+  const aiModel = process.env.AI_MODEL
+
   let generator: ContentGenerator | null = null
   if (openaiKey) {
-    generator = new ContentGenerator(openaiKey)
-    console.log('✅ Content generator initialized (OpenAI)')
+    generator = new ContentGenerator({
+      apiKey: openaiKey,
+      baseURL: openaiBaseURL,
+      defaultModel: aiModel || 'gemini-2.5-flash'
+    })
+    const provider = openaiBaseURL?.includes('127.0.0.1:8317') ? 'CLIProxyAPI' : 'OpenAI'
+    const model = aiModel || 'gemini-2.5-flash'
+    console.log(`✅ Content generator initialized (${provider}, model: ${model})`)
   } else {
     console.log('⚠️  OPENAI_API_KEY not set - content generation disabled')
   }
