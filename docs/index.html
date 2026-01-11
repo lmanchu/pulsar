@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulsar v2.0 - Privacy-First Social Media Automation</title>
+  <meta name="description" content="Revolutionary client-side architecture for AI-powered social media automation. Your credentials never leave your computer.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            purple: {
+              600: '#9333ea',
+              700: '#7e22ce',
+              800: '#6b21a8',
+              900: '#581c87',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e293b 0%, #4c1d95 50%, #1e293b 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .glow {
+      box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-lg border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-2">
+          <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+            <circle cx="10" cy="10" r="3"/>
+          </svg>
+          <span class="text-xl font-bold">Pulsar</span>
+          <span class="text-xs px-2 py-1 bg-purple-600/20 text-purple-400 rounded-full">v2.0 POC</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="#architecture" class="text-gray-300 hover:text-white transition">Architecture</a>
+          <a href="#features" class="text-gray-300 hover:text-white transition">Features</a>
+          <a href="#getting-started" class="text-gray-300 hover:text-white transition">Get Started</a>
+          <a href="https://github.com/lmanchu/pulsar" target="_blank" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition font-medium">
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="gradient-bg pt-32 pb-20 px-4 overflow-hidden relative">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-purple-600 rounded-full blur-3xl float-animation"></div>
+      <div class="absolute bottom-20 right-10 w-96 h-96 bg-pink-600 rounded-full blur-3xl float-animation" style="animation-delay: -3s;"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto text-center relative z-10">
+      <div class="inline-block px-4 py-2 bg-purple-600/20 text-purple-400 rounded-full text-sm font-medium mb-6 border border-purple-600/30">
+        🚀 Introducing v2.0 - Revolutionary Client-Side Architecture
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+        Your social presence,<br>
+        <span class="gradient-text">on autopilot</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        AI-powered social media automation with <strong class="text-white">privacy-first client-side browser control</strong>.
+        Your credentials never leave your computer.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+        <a href="#getting-started" class="px-8 py-4 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold text-lg transition glow">
+          Get Started
+        </a>
+        <a href="https://github.com/lmanchu/pulsar" target="_blank" class="px-8 py-4 border-2 border-purple-600 hover:bg-purple-600/10 rounded-lg font-semibold text-lg transition">
+          View on GitHub
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        <div class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+          <div class="text-3xl font-bold gradient-text">92%</div>
+          <div class="text-sm text-gray-400 mt-1">Cost Reduction</div>
+        </div>
+        <div class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+          <div class="text-3xl font-bold gradient-text">0</div>
+          <div class="text-sm text-gray-400 mt-1">Credentials Sent</div>
+        </div>
+        <div class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+          <div class="text-3xl font-bold gradient-text">3</div>
+          <div class="text-sm text-gray-400 mt-1">Platforms</div>
+        </div>
+        <div class="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+          <div class="text-3xl font-bold gradient-text">100%</div>
+          <div class="text-sm text-gray-400 mt-1">Client-Side</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's New in v2.0 -->
+  <section class="py-20 px-4 bg-gray-900">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">🎯 What's New in v2.0</h2>
+        <p class="text-xl text-gray-400">Revolutionary hybrid architecture that moves automation to your machine</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-16">
+        <!-- v1.0 -->
+        <div class="bg-gray-800/30 p-8 rounded-2xl border border-red-600/30">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">❌</span>
+            <div>
+              <h3 class="text-xl font-bold text-red-400">v1.0 (Legacy)</h3>
+              <p class="text-sm text-gray-500">Centralized Backend</p>
+            </div>
+          </div>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start gap-2">
+              <span class="text-red-500 mt-1">•</span>
+              <span>Credentials stored on cloud servers</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-500 mt-1">•</span>
+              <span>Expensive browser pools ($2,600/mo per 10k users)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-500 mt-1">•</span>
+              <span>Centralized IP (rate limit risks)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-red-500 mt-1">•</span>
+              <span>Privacy concerns</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- v2.0 -->
+        <div class="bg-gradient-to-br from-purple-900/30 to-pink-900/30 p-8 rounded-2xl border-2 border-purple-600 glow">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-2xl">✨</span>
+            <div>
+              <h3 class="text-xl font-bold gradient-text">v2.0 (Current)</h3>
+              <p class="text-sm text-gray-300">Client-Side Hybrid</p>
+            </div>
+          </div>
+          <ul class="space-y-3 text-gray-200">
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span>Credentials stay on your machine (AES-256-GCM)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span>Low cost ($165/mo per 10k users)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span>Distributed IPs (your own network)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-green-400 mt-1">✓</span>
+              <span>Privacy-first design</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture" class="py-20 px-4 bg-gray-800/50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Architecture</h2>
+        <p class="text-xl text-gray-400">How Pulsar v2.0 works</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700">
+          <div class="text-4xl mb-4">🔌</div>
+          <h3 class="text-xl font-bold mb-3">Chrome Extension</h3>
+          <p class="text-gray-400 mb-4">Connects to backend (WebSocket) and native host (Native Messaging)</p>
+          <ul class="text-sm text-gray-500 space-y-2">
+            <li>• Receives job instructions</li>
+            <li>• Manages local queue</li>
+            <li>• Shows status & notifications</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-900 p-8 rounded-2xl border border-purple-600 glow">
+          <div class="text-4xl mb-4">🖥️</div>
+          <h3 class="text-xl font-bold mb-3">Native Host</h3>
+          <p class="text-gray-400 mb-4">Electron app running Puppeteer automation on your machine</p>
+          <ul class="text-sm text-gray-500 space-y-2">
+            <li>• Encrypted credential storage</li>
+            <li>• Browser pool management</li>
+            <li>• Twitter/LinkedIn/Threads automation</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-900 p-8 rounded-2xl border border-gray-700">
+          <div class="text-4xl mb-4">☁️</div>
+          <h3 class="text-xl font-bold mb-3">Backend API</h3>
+          <p class="text-gray-400 mb-4">Cloud service for AI content generation and job scheduling</p>
+          <ul class="text-sm text-gray-500 space-y-2">
+            <li>• Claude/Gemini AI integration</li>
+            <li>• Persona management</li>
+            <li>• Analytics dashboard</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="https://github.com/lmanchu/pulsar/blob/main/ARCHITECTURE-V2.md" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition border border-gray-700">
+          <span>Read Full Architecture Document</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20 px-4 bg-gray-900">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Features</h2>
+        <p class="text-xl text-gray-400">Everything you need for automated social media</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">🤖</div>
+          <h3 class="text-lg font-bold mb-2">AI Content Generation</h3>
+          <p class="text-gray-400">Persona-based content with Claude/Gemini that matches your voice</p>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">💬</div>
+          <h3 class="text-lg font-bold mb-2">Smart Replies</h3>
+          <p class="text-gray-400">Automatically engage with your network and tracked accounts</p>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">📅</div>
+          <h3 class="text-lg font-bold mb-2">Auto Scheduling</h3>
+          <p class="text-gray-400">Set your posting schedule and let Pulsar handle the rest</p>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">🔒</div>
+          <h3 class="text-lg font-bold mb-2">Privacy First</h3>
+          <p class="text-gray-400">AES-256-GCM encryption, credentials never leave your machine</p>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">🌍</div>
+          <h3 class="text-lg font-bold mb-2">Multi-Platform</h3>
+          <p class="text-gray-400">Twitter, LinkedIn, and Threads from one dashboard</p>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-purple-600 transition">
+          <div class="text-3xl mb-3">📊</div>
+          <h3 class="text-lg font-bold mb-2">Analytics</h3>
+          <p class="text-gray-400">Track engagement, growth, and content performance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="py-20 px-4 bg-gray-800/50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Tech Stack</h2>
+        <p class="text-xl text-gray-400">Built with modern technologies</p>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700 text-center">
+          <div class="font-bold mb-2">Extension</div>
+          <div class="text-sm text-gray-400">React 19<br>Manifest V3<br>Tailwind CSS</div>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700 text-center">
+          <div class="font-bold mb-2">Native Host</div>
+          <div class="text-sm text-gray-400">Electron<br>Puppeteer<br>SQLite</div>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700 text-center">
+          <div class="font-bold mb-2">Backend</div>
+          <div class="text-sm text-gray-400">Next.js 15<br>Supabase<br>WebSocket</div>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700 text-center">
+          <div class="font-bold mb-2">AI</div>
+          <div class="text-sm text-gray-400">Claude API<br>Gemini API<br>OpenAI</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Getting Started -->
+  <section id="getting-started" class="py-20 px-4 bg-gray-900">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Getting Started</h2>
+        <p class="text-xl text-gray-400">Set up Pulsar v2.0 in minutes</p>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center font-bold">1</div>
+            <div class="flex-1">
+              <h3 class="font-bold mb-2">Clone Repository</h3>
+              <pre class="bg-gray-900 p-4 rounded-lg text-sm overflow-x-auto"><code>git clone https://github.com/lmanchu/pulsar.git
+cd pulsar && pnpm install</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center font-bold">2</div>
+            <div class="flex-1">
+              <h3 class="font-bold mb-2">Install Native Host</h3>
+              <pre class="bg-gray-900 p-4 rounded-lg text-sm overflow-x-auto"><code>cd apps/native-host
+pnpm install && pnpm build
+pnpm run postinstall</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center font-bold">3</div>
+            <div class="flex-1">
+              <h3 class="font-bold mb-2">Load Extension</h3>
+              <p class="text-gray-400 mb-2">Open Chrome → chrome://extensions/ → Load unpacked → Select <code class="bg-gray-900 px-2 py-1 rounded">extensions/pulsar-extension-v2/</code></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center font-bold">4</div>
+            <div class="flex-1">
+              <h3 class="font-bold mb-2">Start Development</h3>
+              <pre class="bg-gray-900 p-4 rounded-lg text-sm overflow-x-auto"><code># Terminal 1: Backend
+cd apps/web && pnpm dev
+
+# Terminal 2: Native Host
+cd apps/native-host && pnpm dev</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-12 text-center">
+        <a href="https://github.com/lmanchu/pulsar#getting-started" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition font-semibold">
+          <span>View Full Installation Guide</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section class="py-20 px-4 bg-gray-800/50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Roadmap</h2>
+        <p class="text-xl text-gray-400">What's coming next</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-gray-900 p-6 rounded-xl border-2 border-purple-600">
+          <div class="text-sm text-purple-400 font-semibold mb-2">v2.0 - POC</div>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="text-green-400">✓</span>
+              <span class="text-gray-300">Architecture design</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-400">✓</span>
+              <span class="text-gray-300">Extension scaffold</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-green-400">✓</span>
+              <span class="text-gray-300">Native Host scaffold</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-yellow-400">⊙</span>
+              <span class="text-gray-400">Twitter POC test</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700">
+          <div class="text-sm text-gray-400 font-semibold mb-2">v2.1 - Alpha</div>
+          <div class="space-y-2 text-sm text-gray-500">
+            <div>• LinkedIn support</div>
+            <div>• WebSocket integration</div>
+            <div>• Job scheduling</div>
+            <div>• Internal testing (5-10 users)</div>
+          </div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700">
+          <div class="text-sm text-gray-400 font-semibold mb-2">v2.2 - Beta</div>
+          <div class="space-y-2 text-sm text-gray-500">
+            <div>• Threads support</div>
+            <div>• Multi-account mgmt</div>
+            <div>• Chrome Web Store</div>
+            <div>• Public beta (50-100 users)</div>
+          </div>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-xl border border-gray-700">
+          <div class="text-sm text-gray-400 font-semibold mb-2">v2.3 - Production</div>
+          <div class="space-y-2 text-sm text-gray-500">
+            <div>• Payment integration</div>
+            <div>• Customer support</div>
+            <div>• Public launch</div>
+            <div>• Marketing campaign</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 px-4 bg-gradient-to-br from-purple-900/50 to-pink-900/50">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-6">Ready to automate your social presence?</h2>
+      <p class="text-xl text-gray-300 mb-8">Join the privacy-first social media automation revolution</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://github.com/lmanchu/pulsar" target="_blank" class="px-8 py-4 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold text-lg transition glow">
+          Star on GitHub
+        </a>
+        <a href="https://github.com/lmanchu/pulsar/blob/main/ARCHITECTURE-V2.md" target="_blank" class="px-8 py-4 border-2 border-white/20 hover:bg-white/10 rounded-lg font-semibold text-lg transition">
+          Read Architecture
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-4 bg-gray-900 border-t border-gray-800">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+              <circle cx="10" cy="10" r="3"/>
+            </svg>
+            <span class="font-bold">Pulsar</span>
+          </div>
+          <p class="text-sm text-gray-400">Privacy-first social media automation</p>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3">Product</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="#features" class="hover:text-white transition">Features</a></li>
+            <li><a href="#architecture" class="hover:text-white transition">Architecture</a></li>
+            <li><a href="https://pulsar.irisgo.xyz" target="_blank" class="hover:text-white transition">Live Demo</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3">Resources</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="https://github.com/lmanchu/pulsar" target="_blank" class="hover:text-white transition">GitHub</a></li>
+            <li><a href="https://github.com/lmanchu/pulsar/blob/main/ARCHITECTURE-V2.md" target="_blank" class="hover:text-white transition">Documentation</a></li>
+            <li><a href="https://github.com/lmanchu/pulsar/issues" target="_blank" class="hover:text-white transition">Issues</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold mb-3">Company</h4>
+          <ul class="space-y-2 text-sm text-gray-400">
+            <li><a href="https://irisgo.ai" target="_blank" class="hover:text-white transition">IrisGo</a></li>
+            <li><a href="https://github.com/lmanchu/pulsar/blob/main/LICENSE" target="_blank" class="hover:text-white transition">License (MIT)</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
+        <p>© 2026 IrisGo. Open source under MIT License.</p>
+        <p class="mt-2">Built with love by <a href="https://irisgo.ai" target="_blank" class="text-purple-400 hover:text-purple-300 transition">IrisGo</a></p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
