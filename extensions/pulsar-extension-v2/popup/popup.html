@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulsar Dashboard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <img src="../icons/icon48.png" alt="Pulsar">
+        <h1>Pulsar</h1>
+      </div>
+      <div class="status-indicators">
+        <div id="native-status" class="status-dot" title="Native Host"></div>
+        <div id="backend-status" class="status-dot" title="Backend"></div>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat-card">
+        <div class="stat-label">待處理</div>
+        <div class="stat-value" id="pending-jobs">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今日發文</div>
+        <div class="stat-value" id="today-posts">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">成功率</div>
+        <div class="stat-value" id="success-rate">-</div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <button id="post-now" class="action-btn primary">
+        <span class="icon">📝</span>
+        立即發文
+      </button>
+      <button id="view-queue" class="action-btn">
+        <span class="icon">📋</span>
+        查看佇列
+      </button>
+    </section>
+
+    <!-- Recent Jobs -->
+    <section class="recent-jobs">
+      <h2>最近任務</h2>
+      <div id="job-list" class="job-list">
+        <div class="empty-state">尚無任務</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <a href="#" id="open-settings">設定</a>
+      <span class="version">v2.0.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

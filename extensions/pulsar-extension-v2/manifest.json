@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Pulsar - AI Social Media Automation",
+  "version": "2.0.0",
+  "description": "AI-powered social media automation with client-side browser control",
+  "author": "IrisGo",
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "notifications",
+    "alarms"
+  ],
+
+  "host_permissions": [
+    "https://pulsar.irisgo.xyz/*",
+    "wss://pulsar.irisgo.xyz/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Pulsar Dashboard"
+  },
+
+  "options_page": "options/options.html",
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
